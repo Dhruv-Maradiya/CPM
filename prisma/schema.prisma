@@ -1,0 +1,290 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model academics {
+  id                 Int        @id @default(autoincrement())
+  sem                Int
+  year               Int        @db.Year
+  maximumGroupMember Int        @db.TinyInt
+  projects           projects[]
+  groups             groups[]
+
+  @@unique([sem, year], map: "sem")
+}
+
+model backendTechnologies {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique(map: "name", length: 20) @db.TinyText
+  createdAt DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt DateTime   @default(now()) @db.Timestamp(0)
+  projects  projects[]
+}
+
+model branches {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique(map: "name", length: 30) @db.TinyText
+  displayName String     @db.TinyText
+  createdAt   DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime   @default(now()) @db.Timestamp(0)
+  students    students[]
+}
+
+model databaseTechnologies {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique(map: "name", length: 20) @db.TinyText
+  createdAt DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt DateTime   @default(now()) @db.Timestamp(0)
+  projects  projects[]
+}
+
+model faculty {
+  id                  Int                   @id @default(autoincrement())
+  roleId              Int
+  employeeId          String                @unique(map: "employeeId") @db.VarChar(15)
+  name                String                @db.TinyText
+  password            String                @db.VarChar(60)
+  email               String                @unique(map: "email", length: 60) @db.TinyText
+  number              String                @unique(map: "number", length: 10) @db.TinyText
+  createdById         Int?
+  isBlocked           Boolean               @default(false)
+  createdAt           DateTime              @default(now()) @db.Timestamp(0)
+  updatedAt           DateTime              @default(now()) @db.Timestamp(0)
+  createdBy           faculty?              @relation("facultyTofaculty", fields: [createdById], references: [id], onDelete: Cascade, map: "createdById")
+  other_faculty       faculty[]             @relation("facultyTofaculty")
+  facultyRoles        facultyRoles          @relation(fields: [roleId], references: [id], onDelete: Cascade, map: "roleToFacultyRole")
+  mediaComments       mediaComments[]
+  notifications       notifications[]
+  projectGuideMapping projectGuideMapping[]
+  projects            projects[]
+  tasks               tasks[]
+
+  @@index([createdById], map: "createdBy_idx")
+  @@index([roleId], map: "roleToFacultyRole_idx")
+}
+
+model facultyPermission {
+  id           Int          @id @default(autoincrement())
+  roleId       Int
+  table        String       @db.VarChar(45)
+  permission   String       @db.VarChar(45)
+  conditions   String?      @default("[]") @db.VarChar(400)
+  createdAt    DateTime     @default(now()) @db.Timestamp(0)
+  updatedAt    DateTime     @default(now()) @db.Timestamp(0)
+  facultyRoles facultyRoles @relation(fields: [roleId], references: [id], onUpdate: Restrict, map: "roleToFaculty")
+
+  @@index([roleId], map: "roleToFaculty_idx")
+}
+
+model facultyRoles {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique(map: "name_UNIQUE", length: 20) @db.TinyText
+  priority          Int
+  createdAt         DateTime            @default(now()) @db.Timestamp(0)
+  updatedAt         DateTime            @default(now()) @db.Timestamp(0)
+  faculty           faculty[]
+  facultyPermission facultyPermission[]
+}
+
+model frontendTechnologies {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique(map: "name", length: 20) @db.TinyText
+  createdAt DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt DateTime   @default(now()) @db.Timestamp(0)
+  projects  projects[]
+}
+
+model groupParticipants {
+  id        Int                    @id @default(autoincrement())
+  groupId   Int
+  studentId Int
+  semester  Int                    @db.TinyInt
+  role      groupParticipants_role
+  createdAt DateTime               @default(now()) @db.Timestamp(0)
+  updatedAt DateTime               @default(now()) @db.Timestamp(0)
+  group     groups                 @relation(fields: [groupId], references: [id], onDelete: Cascade, map: "groupParticipants_ibfk_1")
+  student   students               @relation(fields: [studentId], references: [id], onDelete: Cascade, map: "groupParticipants_ibfk_2")
+
+  @@unique([groupId, studentId], map: "groupId")
+  @@unique([studentId, semester], map: "studentId")
+  @@index([role], map: "role_idx")
+}
+
+model groups {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique(map: "name") @db.VarChar(100)
+  academicId         Int
+  createdAt          DateTime             @default(now()) @db.Timestamp(0)
+  updatedAt          DateTime             @default(now()) @db.Timestamp(0)
+  academic           academics            @relation(fields: [academicId], references: [id], onUpdate: Restrict)
+  groupParticipants  groupParticipants[]
+  invitationForGroup invitationForGroup[]
+  projects           projects?
+}
+
+model invitationForGroup {
+  id              Int                       @id @default(autoincrement())
+  memberId        Int
+  groupLeaderId   Int
+  groupId         Int
+  status          invitationForGroup_status
+  statusChangedAt DateTime?                 @db.Timestamp(0)
+  createdAt       DateTime                  @default(now()) @db.Timestamp(0)
+  updatedAt       DateTime                  @default(now()) @db.Timestamp(0)
+  member          students                  @relation("invitationForGroup_toMemberTostudents", fields: [memberId], references: [id], onUpdate: Restrict, map: "invitationForGroup_ibfk_1")
+  groupLeader     students                  @relation("invitationForGroup_fromGroupLeaderTostudents", fields: [groupLeaderId], references: [id], onUpdate: Restrict, map: "invitationForGroup_ibfk_2")
+  group           groups                    @relation(fields: [groupId], references: [id], onUpdate: Restrict, map: "invitationForGroup_ibfk_3")
+
+  @@index([groupLeaderId], map: "fromMember")
+  @@index([groupId], map: "group")
+  @@index([memberId], map: "toMember")
+}
+
+model media {
+  id            Int             @id @default(autoincrement())
+  identifier    String          @unique(map: "identifier") @db.VarChar(200)
+  name          String          @db.TinyText
+  projectId     Int
+  format        String          @db.TinyText
+  isReviewed    Boolean?
+  reviewedBy    Int?
+  createdAt     DateTime        @default(now()) @db.Timestamp(0)
+  project       projects        @relation(fields: [projectId], references: [id], onUpdate: Restrict, map: "media_ibfk_1")
+  mediaComments mediaComments[]
+
+  @@index([projectId], map: "project")
+}
+
+model mediaComments {
+  id          Int      @id @default(autoincrement())
+  mediaId     Int
+  comment     String   @db.VarChar(2000)
+  createdAt   DateTime @default(now()) @db.Timestamp(0)
+  commentedBy Int
+  faculty     faculty  @relation(fields: [commentedBy], references: [id], onUpdate: Restrict, map: "mediaComments_ibfk_1")
+  media       media    @relation(fields: [mediaId], references: [id], onUpdate: Restrict, map: "mediaComments_ibfk_2")
+
+  @@index([commentedBy], map: "commentedBy")
+}
+
+model notifications {
+  id        Int      @id @default(autoincrement())
+  message   String   @db.VarChar(500)
+  sentBy    Int
+  toUsers   String   @default("[]") @db.VarChar(4000)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  faculty   faculty  @relation(fields: [sentBy], references: [id], onUpdate: Restrict, map: "notifications_ibfk_1")
+
+  @@index([sentBy], map: "sendBy")
+}
+
+model projectGuideMapping {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  guideId   Int
+  faculty   faculty  @relation(fields: [guideId], references: [id], onUpdate: Restrict, map: "projectGuideMapping_ibfk_1")
+  project   projects @relation(fields: [projectId], references: [id], onUpdate: Restrict, map: "projectGuideMapping_ibfk_2")
+
+  @@unique([projectId, guideId], map: "project")
+  @@index([guideId], map: "guild")
+}
+
+model projects {
+  id                   Int                   @id @default(autoincrement())
+  name                 String                @unique(map: "name") @db.VarChar(100)
+  academicId           Int
+  frontendTechnologyId Int
+  backendTechnologyId  Int
+  databaseTechnologyId Int
+  groupId              Int                   @unique(map: "group_2")
+  abstract             String                @db.VarChar(500)
+  description          String                @db.VarChar(2000)
+  updatedAt            DateTime              @default(now()) @db.Timestamp(0)
+  createdAt            DateTime              @default(now()) @db.Timestamp(0)
+  isVerified           Boolean               @default(false)
+  verifiedByFacultyId  Int?
+  media                media[]
+  projectGuideMapping  projectGuideMapping[]
+  group                groups                @relation(fields: [groupId], references: [id], onDelete: Cascade, map: "projects_ibfk_1")
+  academic             academics             @relation(fields: [academicId], references: [id], onUpdate: Restrict, map: "projects_ibfk_2")
+  backendTechnology    backendTechnologies   @relation(fields: [backendTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_3")
+  databaseTechnology   databaseTechnologies  @relation(fields: [databaseTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_4")
+  frontendTechnology   frontendTechnologies  @relation(fields: [frontendTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_5")
+  faculty              faculty?              @relation(fields: [verifiedByFacultyId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "projects_ibfk_6")
+  tasks                tasks[]
+
+  @@index([academicId], map: "academic")
+  @@index([backendTechnologyId], map: "backendTechnology")
+  @@index([databaseTechnologyId], map: "databaseTechnology")
+  @@index([frontendTechnologyId], map: "frontendTechnology")
+  @@index([groupId], map: "group")
+  @@index([verifiedByFacultyId], map: "verifyBy")
+}
+
+model students {
+  id                                                              Int                  @id @default(autoincrement())
+  firstName                                                       String               @db.TinyText
+  lastName                                                        String?              @db.TinyText
+  password                                                        String               @db.VarChar(60)
+  semester                                                        Int                  @db.TinyInt
+  branch                                                          Int
+  enrollementNo                                                   String               @unique(map: "enrollementNo", length: 12) @db.TinyText
+  email                                                           String               @unique(map: "email") @db.VarChar(255)
+  number                                                          String               @unique(map: "number", length: 10) @db.TinyText
+  createdAt                                                       DateTime             @default(now()) @db.Timestamp(0)
+  updatedAt                                                       DateTime             @default(now()) @db.Timestamp(0)
+  groupParticipants                                               groupParticipants[]
+  invitationForGroup_invitationForGroup_toMemberTostudents        invitationForGroup[] @relation("invitationForGroup_toMemberTostudents")
+  invitationForGroup_invitationForGroup_fromGroupLeaderTostudents invitationForGroup[] @relation("invitationForGroup_fromGroupLeaderTostudents")
+  branches                                                        branches             @relation(fields: [branch], references: [id], onDelete: Cascade, map: "students_ibfk_1")
+  tasks_tasks_assignedToTostudents                                tasks[]              @relation("tasks_assignedToTostudents")
+  tasks_tasks_createdByMemberTostudents                           tasks[]              @relation("tasks_createdByMemberTostudents")
+
+  @@index([branch], map: "branch")
+}
+
+model tasks {
+  id                      Int          @id @default(autoincrement())
+  projectId               Int
+  name                    String       @db.VarChar(500)
+  description             String       @db.VarChar(2000)
+  priority                Boolean
+  status                  tasks_status
+  assignedToParticipantId Int
+  startTime               DateTime?    @db.DateTime(0)
+  endTime                 DateTime?    @db.DateTime(0)
+  createdByLeaderId       Int?
+  createdByFacultyId      Int?
+  assignedToParticipant   students     @relation("tasks_assignedToTostudents", fields: [assignedToParticipantId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tasks_ibfk_1")
+  faculty                 faculty?     @relation(fields: [createdByFacultyId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_2")
+  createdByLeader         students?    @relation("tasks_createdByMemberTostudents", fields: [createdByLeaderId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_3")
+  project                 projects     @relation(fields: [projectId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_4")
+
+  @@index([assignedToParticipantId], map: "assignedTo")
+  @@index([createdByFacultyId], map: "createdByFaculty")
+  @@index([createdByLeaderId], map: "createdByMember")
+  @@index([projectId], map: "project")
+}
+
+enum groupParticipants_role {
+  LEADER
+  MEMBER
+}
+
+enum invitationForGroup_status {
+  ACCEPTED
+  REJECTED
+  PENDING
+}
+
+enum tasks_status {
+  COMPLETEED
+  DELAYED
+  PENDING
+  IN_PROGRESS
+}
