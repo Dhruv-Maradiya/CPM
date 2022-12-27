@@ -68,7 +68,7 @@ const findManyByProject = (projectId: number) => {
     }
   });
 };
-const findManyByProjectFaculty = (facultyId: number) => {
+const findManyByProjectGuide = (facultyId: number) => {
   return new Promise<findManyByProjectFacultyReturnType[]>(
     async (resolve, reject) => {
       try {
@@ -100,5 +100,5 @@ export default {
   update,
   findMany,
   findManyByProject,
-  findManyByProjectFaculty,
+  findManyByProjectGuide,
 };

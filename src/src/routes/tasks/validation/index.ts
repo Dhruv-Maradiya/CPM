@@ -1,5 +1,9 @@
 import { yup } from "../../../../utils/index.js";
 
+const isValidDate = (d: Date): boolean => {
+  return d instanceof Date && !isNaN(d.getTime());
+};
+
 const create = yup
   .object()
   .shape(
@@ -9,20 +13,40 @@ const create = yup
       description: yup.string().required(),
       priority: yup.number().required().min(1).max(10),
       assignedToParticipantId: yup.number().required(),
-      startTime: yup.date().optional(),
-      endTime: yup.date().optional(),
+      startTime: yup
+        .mixed()
+        .test("testDate", "startTime must be a valid date", (val) => {
+          if (val === undefined || val === null) {
+            return true;
+          } else {
+            const newDate = new Date(val);
+            return isValidDate(newDate);
+          }
+        })
+        .optional(),
+      endTime: yup
+        .mixed()
+        .test("testDate", "endTime must be a valid date", (val) => {
+          if (val === undefined || val === null) {
+            return true;
+          } else {
+            const newDate = new Date(val);
+            return isValidDate(newDate);
+          }
+        })
+        .optional(),
       createdByLeaderId: yup
         .number()
         .optional()
         .nullable()
         .when("createdByFacultyId", {
           is: (val: number | null) => val,
-          then: yup
+          then: yup.number().strip(true),
+          otherwise: yup
             .number()
             .required(
               "One of the following is required createdByLeaderId or createdByFacultyId"
             ),
-          otherwise: yup.number().optional().nullable(),
         }),
       createdByFacultyId: yup
         .number()
@@ -30,12 +54,12 @@ const create = yup
         .nullable()
         .when("createdByLeaderId", {
           is: (val: number | null) => val,
-          then: yup
+          then: yup.number().strip(true),
+          otherwise: yup
             .number()
             .required(
               "One of the following is required createdByLeaderId or createdByFacultyId"
             ),
-          otherwise: yup.number().optional().nullable(),
         }),
     },
     [["createdByLeaderId", "createdByFacultyId"]]
@@ -52,6 +76,7 @@ const update = yup
     priority: yup.number().optional().min(1).max(10),
     startTime: yup.date().optional(),
     endTime: yup.date().optional(),
+    status: yup.string().optional(),
   })
   .noUnknown(true)
   .strict(true);

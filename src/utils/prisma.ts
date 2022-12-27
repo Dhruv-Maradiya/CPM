@@ -1,6 +1,6 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 
-const environment = process.env["ENVIRONMENT"] as string;
+const environment = process.env["NODE_ENV"] as string;
 
 interface Config {
   log?: Prisma.LogLevel[];

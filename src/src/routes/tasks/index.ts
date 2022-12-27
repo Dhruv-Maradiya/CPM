@@ -10,7 +10,7 @@ const router = Router();
 router.post("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
-    await validateSchema<Body>(validation.create, req.body, true);
+    req.body = await validateSchema<Body>(validation.create, req.body, true);
     const body: Prisma.tasksUncheckedCreateInput = {
       ...req.body,
       status: "PENDING",
@@ -26,7 +26,7 @@ router.post("/", async (req, res, next) => {
 router.put("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
-    await validateSchema<Body>(validation.update, req.body, true);
+    req.body = await validateSchema<Body>(validation.update, req.body, true);
 
     const id = req.body.id;
     delete req.body.id;

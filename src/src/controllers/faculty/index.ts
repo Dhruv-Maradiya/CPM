@@ -1,11 +1,12 @@
 /* eslint-disable no-async-promise-executor */
-import { prisma } from "../../../utils/index.js";
+import { hash, prisma, verify, sign } from "../../../utils/index.js";
 import { Prisma, faculty } from "@prisma/client";
-import { NotFoundError } from "../../../exceptions/index.js";
+import { ForbiddenError, NotFoundError } from "../../../exceptions/index.js";
 
 const create = (data: Prisma.facultyUncheckedCreateInput) => {
   return new Promise<faculty>(async (resolve, reject) => {
     try {
+      data.password = await hash(data.password);
       const faculty = await prisma.faculty.create({
         data: data,
       });
@@ -57,10 +58,56 @@ const findMany = () => {
     }
   });
 };
+const login = (employeeId: string, password: string) => {
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      const faculty = await prisma.faculty.findUnique({
+        where: {
+          employeeId: employeeId,
+        },
+        select: {
+          password: true,
+          employeeId: true,
+          id: true,
+          isBlocked: true,
+          facultyRoles: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (!faculty) {
+        throw new ForbiddenError("invalid credentials");
+      }
+
+      if (faculty.isBlocked) {
+        throw new ForbiddenError("faculty is blocked");
+      }
+
+      const isCorrectPassword = await verify(password, faculty.password);
+
+      if (isCorrectPassword === false) {
+        throw new ForbiddenError("invalid credentials");
+      }
+
+      const token = sign({
+        employeeId: faculty.employeeId,
+        id: faculty.id,
+      });
+
+      return resolve(token);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 export default {
   create,
   update,
   find,
   findMany,
+  login,
 };

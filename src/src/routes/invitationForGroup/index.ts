@@ -29,6 +29,24 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
+router.put("/updateStatus", async (req, res, next) => {
+  try {
+    type Body = yup.InferType<typeof validation.update>;
+    await validateSchema<Body>(validation.update, req.body, false);
+
+    const id = req.body.id;
+    delete req.body.id;
+
+    const body: Prisma.invitationForGroupUncheckedUpdateInput = req.body;
+
+    const invitationForGroup = await InvitationForGroup.updateStatus(body, id);
+
+    res.locals["data"] = invitationForGroup;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 router.get("/findManyByStudent", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.findManyByStudent>;

@@ -10,6 +10,15 @@ const create = yup
   .noUnknown(true)
   .strict(true);
 
+const update = yup
+  .object()
+  .shape({
+    status: yup.string().required().oneOf(["ACCEPTED", "REJECTED"]),
+    id: yup.number().required(),
+  })
+  .noUnknown(true)
+  .strict(true);
+
 const findManyByStudent = yup
   .object()
   .shape({ studentId: yup.number().required() });
@@ -21,4 +30,5 @@ export default {
   create,
   findManyByStudent,
   findManyByLeader,
+  update,
 };

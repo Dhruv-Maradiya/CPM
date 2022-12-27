@@ -4,6 +4,7 @@ const create = yup
   .object()
   .shape({
     name: yup.string().required(),
+    academicId: yup.number().required(),
     leaderId: yup.number().required(),
   })
   .noUnknown(true)
@@ -14,7 +15,6 @@ const update = yup
   .shape({
     id: yup.number().required(),
     name: yup.string().optional(),
-    leaderId: yup.number().optional(),
   })
   .noUnknown(true)
   .strict(true);

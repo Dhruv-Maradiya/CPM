@@ -1,11 +1,12 @@
 /* eslint-disable no-async-promise-executor */
-import { prisma } from "../../../utils/index.js";
+import { hash, prisma, sign, verify } from "../../../utils/index.js";
 import { Prisma, students } from "@prisma/client";
-import { NotFoundError } from "../../../exceptions/index.js";
+import { ForbiddenError, NotFoundError } from "../../../exceptions/index.js";
 
 const create = (data: Prisma.studentsUncheckedCreateInput) => {
   return new Promise<students>(async (resolve, reject) => {
     try {
+      data.password = await hash(data.password);
       const student = await prisma.students.create({
         data: data,
       });
@@ -57,10 +58,46 @@ const findMany = () => {
     }
   });
 };
+const login = (enrollmentNo: string, password: string) => {
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      const student = await prisma.students.findUnique({
+        where: {
+          enrollmentNo: enrollmentNo,
+        },
+        select: {
+          password: true,
+          enrollmentNo: true,
+          id: true,
+        },
+      });
+
+      if (!student) {
+        throw new ForbiddenError("invalid credentials");
+      }
+
+      const isCorrectPassword = await verify(password, student.password);
+
+      if (isCorrectPassword === false) {
+        throw new ForbiddenError("invalid credentials");
+      }
+
+      const token = sign({
+        enrollment: student.enrollmentNo,
+        id: student.id,
+      });
+
+      return resolve(token);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 export default {
   create,
   update,
   find,
   findMany,
+  login,
 };

@@ -38,6 +38,7 @@ router.put("/", async (req, res, next) => {
     res.locals["data"] = frontendTechnology;
     next();
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });

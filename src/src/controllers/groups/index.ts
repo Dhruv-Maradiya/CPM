@@ -116,15 +116,10 @@ const assignLeader = (
         );
       }
 
-      let isLeaderExists = false;
       for (let i = 0; i < groupDetails.groupParticipants.length; i++) {
         if (groupDetails.groupParticipants[i]?.role === "LEADER") {
-          isLeaderExists = true;
+          throw new NotFoundError("group is already assigned a leader");
         }
-      }
-
-      if (isLeaderExists) {
-        throw new NotFoundError("group is already assigned a leader");
       }
 
       const studentDetails = await db.students.findUnique({

@@ -1,6 +1,10 @@
 import { Prisma } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
-import { ApplicationError, DuplicationError } from "../exceptions/index.js";
+import {
+  ApplicationError,
+  DuplicationError,
+  NotFoundError,
+} from "../exceptions/index.js";
 
 const errorHandler = (
   err: unknown,
@@ -23,6 +27,13 @@ const errorHandler = (
       const error = new DuplicationError(
         `Duplicate entry for ${err?.meta?.["target"]}`
       );
+      return res.status(error.status).json({
+        status: "error",
+        name: error.name,
+        message: error.message,
+      });
+    } else if (err.code === "P2025") {
+      const error = new NotFoundError("record to update not found");
       return res.status(error.status).json({
         status: "error",
         name: error.name,
