@@ -1,7 +1,27 @@
 /* eslint-disable no-async-promise-executor */
 import { prisma } from "../../../utils/index.js";
-import { Prisma, projects } from "@prisma/client";
+import { groupParticipants_role, Prisma, projects } from "@prisma/client";
 import { NotFoundError } from "../../../exceptions/index.js";
+
+type ProjectByStudentResponse = {
+  id: number;
+  name: string;
+  academic: {
+    id: number;
+    year: number;
+    sem: number;
+  };
+  isVerified: boolean;
+  group: {
+    id: number;
+    name: string;
+    groupParticipants: {
+      id: number;
+      semester: number;
+      role: groupParticipants_role;
+    }[];
+  };
+};
 
 const create = (data: Prisma.projectsUncheckedCreateInput) => {
   return new Promise<projects>(async (resolve, reject) => {
@@ -57,10 +77,60 @@ const findMany = () => {
     }
   });
 };
+const projectsByStudent = (studentId: number) => {
+  return new Promise<ProjectByStudentResponse[]>(async (resolve, reject) => {
+    try {
+      const projects: ProjectByStudentResponse[] =
+        await prisma.projects.findMany({
+          where: {
+            group: {
+              groupParticipants: {
+                some: {
+                  studentId: studentId,
+                },
+              },
+            },
+          },
+          select: {
+            id: true,
+            name: true,
+            academic: {
+              select: {
+                id: true,
+                year: true,
+                sem: true,
+              },
+            },
+            group: {
+              select: {
+                id: true,
+                name: true,
+                groupParticipants: {
+                  select: {
+                    id: true,
+                    semester: true,
+                    role: true,
+                  },
+                  where: {
+                    studentId: studentId,
+                  },
+                },
+              },
+            },
+            isVerified: true,
+          },
+        });
+      return resolve(projects);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 export default {
   create,
   update,
   find,
   findMany,
+  projectsByStudent,
 };

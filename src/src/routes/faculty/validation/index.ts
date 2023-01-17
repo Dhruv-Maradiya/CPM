@@ -42,8 +42,21 @@ const update = yup
 
 const find = yup.object().shape({ id: yup.number().required() });
 
+const login = yup.object().shape({
+  employeeId: yup.string().max(15).required(),
+  password: yup
+    .string()
+    .required()
+    .min(8, "password must be at least 8 characters")
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+      "must contain at least one uppercase letter, one lowercase letter, one digit, and one special"
+    ),
+});
+
 export default {
   create,
   update,
   find,
+  login,
 };

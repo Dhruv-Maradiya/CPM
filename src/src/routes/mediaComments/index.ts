@@ -4,10 +4,11 @@ import { Router } from "express";
 import { validateSchema, yup } from "../../../utils/index.js";
 import MediaComments from "../../controllers/mediaComments/index.js";
 import validation from "./validation/index.js";
+import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", async (req, res, next) => {
+router.post("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     const validatedSchema = await validateSchema<Body>(

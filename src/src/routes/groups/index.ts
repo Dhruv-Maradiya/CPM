@@ -4,10 +4,11 @@ import { Router } from "express";
 import { prisma, validateSchema, yup } from "../../../utils/index.js";
 import Groups from "../../controllers/groups/index.js";
 import validation from "./validation/index.js";
+import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", async (req, res, next) => {
+router.post("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     await validateSchema<Body>(validation.create, req.body, false);
@@ -30,7 +31,7 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", async (req, res, next) => {
+router.put("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     await validateSchema<Body>(validation.update, req.body, true);

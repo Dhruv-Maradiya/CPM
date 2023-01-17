@@ -83,8 +83,9 @@ const login = (enrollmentNo: string, password: string) => {
       }
 
       const token = sign({
-        enrollment: student.enrollmentNo,
+        identifier: student.enrollmentNo,
         id: student.id,
+        type: "STUDENT",
       });
 
       return resolve(token);

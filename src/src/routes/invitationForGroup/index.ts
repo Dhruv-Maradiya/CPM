@@ -4,10 +4,11 @@ import { Router } from "express";
 import { validateSchema, yup } from "../../../utils/index.js";
 import InvitationForGroup from "../../controllers/invitationForGroup/index.js";
 import validation from "./validation/index.js";
+import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", async (req, res, next) => {
+router.post("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     const validatedBody = await validateSchema<Body>(
@@ -29,7 +30,7 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
-router.put("/updateStatus", async (req, res, next) => {
+router.put("/updateStatus", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     await validateSchema<Body>(validation.update, req.body, false);
@@ -47,7 +48,7 @@ router.put("/updateStatus", async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyByStudent", async (req, res, next) => {
+router.get("/findManyByStudent", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.findManyByStudent>;
     const query = await validateSchema<Body>(
@@ -66,7 +67,7 @@ router.get("/findManyByStudent", async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyByLeader", async (req, res, next) => {
+router.get("/findManyByLeader", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.findManyByLeader>;
     const query = await validateSchema<Body>(

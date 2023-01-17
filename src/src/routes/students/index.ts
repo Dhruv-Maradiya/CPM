@@ -4,10 +4,11 @@ import { Router } from "express";
 import { validateSchema, yup } from "../../../utils/index.js";
 import Students from "../../controllers/students/index.js";
 import validation from "./validation/index.js";
+import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", async (req, res, next) => {
+router.post("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     const validatedBody = await validateSchema<Body>(
@@ -24,7 +25,7 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", async (req, res, next) => {
+router.put("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     await validateSchema<Body>(validation.update, req.body, true);
@@ -63,6 +64,27 @@ router.get("/findMany", async (_req, res, next) => {
     const students = await Students.findMany();
 
     res.locals["data"] = students;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+router.post("/login", async (req, res, next) => {
+  try {
+    type Body = yup.InferType<typeof validation.login>;
+    const validatedBody = await validateSchema<Body>(
+      validation.login,
+      req.body,
+      false
+    );
+    const token = await Students.login(
+      validatedBody.enrollmentNo,
+      validatedBody.password
+    );
+
+    res.locals["data"] = {
+      token: token,
+    };
     next();
   } catch (error) {
     next(error);

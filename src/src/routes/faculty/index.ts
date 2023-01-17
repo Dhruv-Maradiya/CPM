@@ -4,10 +4,11 @@ import { Router } from "express";
 import { validateSchema, yup } from "../../../utils/index.js";
 import Faculty from "../../controllers/faculty/index.js";
 import validation from "./validation/index.js";
+import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", async (req, res, next) => {
+router.post("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     const validatedBody = await validateSchema<Body>(
@@ -24,7 +25,7 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", async (req, res, next) => {
+router.put("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     await validateSchema<Body>(validation.update, req.body, true);
@@ -41,7 +42,7 @@ router.put("/", async (req, res, next) => {
     next(error);
   }
 });
-router.get("/find", async (req, res, next) => {
+router.get("/find", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.find>;
     const validatedQuery = await validateSchema<Body>(
@@ -49,6 +50,7 @@ router.get("/find", async (req, res, next) => {
       req.query,
       true
     );
+
     const id = validatedQuery["id"]; // validation goes here
     const faculty = await Faculty.find(id);
 
@@ -58,11 +60,32 @@ router.get("/find", async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findMany", async (_req, res, next) => {
+router.get("/findMany", auth, async (_req, res, next) => {
   try {
     const faculties = await Faculty.findMany();
 
     res.locals["data"] = faculties;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+router.post("/login", async (req, res, next) => {
+  try {
+    type Body = yup.InferType<typeof validation.login>;
+    const validatedBody = await validateSchema<Body>(
+      validation.login,
+      req.body,
+      false
+    );
+    const token = await Faculty.login(
+      validatedBody.employeeId,
+      validatedBody.password
+    );
+
+    res.locals["data"] = {
+      token: token,
+    };
     next();
   } catch (error) {
     next(error);

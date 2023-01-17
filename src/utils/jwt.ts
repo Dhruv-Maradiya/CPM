@@ -1,13 +1,17 @@
 import jwt, { Secret } from "jsonwebtoken";
 
+type UserType = "STUDENT" | "FACULTY";
+
 type Student = {
   id: number;
-  enrollment: string;
+  identifier: string;
+  type: UserType;
 };
 
 type Faculty = {
   id: number;
-  employeeId: string;
+  identifier: string;
+  type: UserType;
 };
 
 const SECRET_KEY = process.env["JWT_SECRET_KEY"] as Secret;

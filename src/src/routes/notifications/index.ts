@@ -4,10 +4,11 @@ import { Router } from "express";
 import { validateSchema, yup } from "../../../utils/index.js";
 import Notifications from "../../controllers/notifications/index.js";
 import validation from "./validation/index.js";
+import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", async (req, res, next) => {
+router.post("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     const validatedSchema = await validateSchema<Body>(
@@ -26,7 +27,7 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyByFaculty", async (req, res, next) => {
+router.get("/findManyByFaculty", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.findManyByFaculty>;
     const query = await validateSchema<Body>(

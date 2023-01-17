@@ -198,12 +198,12 @@ model projects {
   id                   Int                   @id @default(autoincrement())
   name                 String                @unique(map: "name") @db.VarChar(100)
   academicId           Int
-  frontendTechnologyId Int
-  backendTechnologyId  Int
-  databaseTechnologyId Int
+  frontendTechnologyId Int?
+  backendTechnologyId  Int?
+  databaseTechnologyId Int?
   groupId              Int                   @unique(map: "group_2")
-  abstract             String                @db.VarChar(500)
-  description          String                @db.VarChar(2000)
+  abstract             String?               @db.VarChar(500)
+  description          String?               @db.VarChar(2000)
   updatedAt            DateTime              @default(now()) @db.Timestamp(0)
   createdAt            DateTime              @default(now()) @db.Timestamp(0)
   isVerified           Boolean               @default(false)
@@ -212,9 +212,9 @@ model projects {
   projectGuideMapping  projectGuideMapping[]
   group                groups                @relation(fields: [groupId], references: [id], onDelete: Cascade, map: "projects_ibfk_1")
   academic             academics             @relation(fields: [academicId], references: [id], onUpdate: Restrict, map: "projects_ibfk_2")
-  backendTechnology    backendTechnologies   @relation(fields: [backendTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_3")
-  databaseTechnology   databaseTechnologies  @relation(fields: [databaseTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_4")
-  frontendTechnology   frontendTechnologies  @relation(fields: [frontendTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_5")
+  backendTechnology    backendTechnologies?  @relation(fields: [backendTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_3")
+  databaseTechnology   databaseTechnologies? @relation(fields: [databaseTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_4")
+  frontendTechnology   frontendTechnologies? @relation(fields: [frontendTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_5")
   faculty              faculty?              @relation(fields: [verifiedByFacultyId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "projects_ibfk_6")
   tasks                tasks[]
 

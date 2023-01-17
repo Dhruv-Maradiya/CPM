@@ -93,8 +93,9 @@ const login = (employeeId: string, password: string) => {
       }
 
       const token = sign({
-        employeeId: faculty.employeeId,
+        identifier: faculty.employeeId,
         id: faculty.id,
+        type: "FACULTY",
       });
 
       return resolve(token);

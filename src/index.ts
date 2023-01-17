@@ -17,8 +17,10 @@ import Projects from "./src/routes/projects/index.js";
 import Tasks from "./src/routes/tasks/index.js";
 import Students from "./src/routes/students/index.js";
 import url from "url";
-import responseHandler from "./middleware/response.js";
-import exceptionMiddleware from "./middleware/errorHandler.js";
+import {
+  errorHandler as exceptionMiddleware,
+  response as responseHandler,
+} from "./middleware/index.js";
 import { NotFoundError } from "./exceptions/index.js";
 
 const __filename = url.fileURLToPath(import.meta.url);
