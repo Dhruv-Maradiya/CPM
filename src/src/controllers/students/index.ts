@@ -82,12 +82,22 @@ const login = (enrollmentNo: string, password: string) => {
         throw new ForbiddenError("invalid credentials");
       }
 
-      const token = sign({
-        identifier: student.enrollmentNo,
-        id: student.id,
+      const token = await signToken(student.enrollmentNo, student.id);
+
+      return resolve(token);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+const signToken = async (enrollmentNo: string, id: number): Promise<string> => {
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      const token = await sign({
+        identifier: enrollmentNo,
+        id: id,
         type: "STUDENT",
       });
-
       return resolve(token);
     } catch (error) {
       reject(error);
@@ -101,4 +111,5 @@ export default {
   find,
   findMany,
   login,
+  signToken,
 };

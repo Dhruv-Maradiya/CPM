@@ -5,12 +5,12 @@ const create = yup
   .shape({
     name: yup.string().required(),
     academicId: yup.number().required(),
-    frontendTechnologyId: yup.number().optional(),
-    databaseTechnologyId: yup.number().optional(),
-    backendTechnologyId: yup.number().optional(),
+    frontendTechnologyId: yup.number().required(),
+    databaseTechnologyId: yup.number().required(),
+    backendTechnologyId: yup.number().required(),
     groupId: yup.number().required(),
-    abstract: yup.string().optional(),
-    description: yup.string().optional(),
+    abstract: yup.string().required(),
+    description: yup.string().required(),
   })
   .noUnknown(true)
   .strict(true);
