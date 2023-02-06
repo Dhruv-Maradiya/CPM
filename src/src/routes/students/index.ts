@@ -78,13 +78,14 @@ router.post("/login", async (req, res, next) => {
       req.body,
       false
     );
-    const token = await Students.login(
+    const { token, userId } = await Students.login(
       validatedBody.enrollmentNo,
       validatedBody.password
     );
 
     res.locals["data"] = {
       token: token,
+      userId: userId,
     };
     next();
   } catch (error) {

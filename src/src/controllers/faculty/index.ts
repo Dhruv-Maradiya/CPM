@@ -3,6 +3,11 @@ import { hash, prisma, verify, sign } from "../../../utils/index.js";
 import { Prisma, faculty } from "@prisma/client";
 import { ForbiddenError, NotFoundError } from "../../../exceptions/index.js";
 
+type LoginResponse = {
+  token: string;
+  userId: number;
+};
+
 const create = (data: Prisma.facultyUncheckedCreateInput) => {
   return new Promise<faculty>(async (resolve, reject) => {
     try {
@@ -59,7 +64,7 @@ const findMany = () => {
   });
 };
 const login = (employeeId: string, password: string) => {
-  return new Promise<string>(async (resolve, reject) => {
+  return new Promise<LoginResponse>(async (resolve, reject) => {
     try {
       const faculty = await prisma.faculty.findUnique({
         where: {
@@ -92,13 +97,13 @@ const login = (employeeId: string, password: string) => {
         throw new ForbiddenError("invalid credentials");
       }
 
-      const token = sign({
+      const token = await sign({
         identifier: faculty.employeeId,
         id: faculty.id,
         type: "FACULTY",
       });
 
-      return resolve(token);
+      return resolve({ token, userId: faculty.id });
     } catch (error) {
       reject(error);
     }
