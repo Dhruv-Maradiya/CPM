@@ -17,7 +17,10 @@ router.post("/", auth, async (req, res, next) => {
       false
     );
 
-    const body: Prisma.notificationsUncheckedCreateInput = validatedSchema;
+    const body: Prisma.notificationsUncheckedCreateInput = {
+      ...validatedSchema,
+      sentBy: res.locals["user"].userDetails.id as number,
+    };
 
     const notification = await Notifications.create(body);
 
@@ -39,6 +42,18 @@ router.get("/findManyByFaculty", auth, async (req, res, next) => {
     const notifications = await Notifications.findManyByFaculty(
       query.facultyId
     );
+
+    res.locals["data"] = notifications;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+router.get("/findManyByStudent", auth, async (_req, res, next) => {
+  try {
+    const id = res.locals["user"].userDetails.id as number;
+
+    const notifications = await Notifications.findManyByStudent(id);
 
     res.locals["data"] = notifications;
     next();

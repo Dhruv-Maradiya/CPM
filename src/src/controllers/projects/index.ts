@@ -50,12 +50,59 @@ const update = (data: Prisma.projectsUpdateInput, id: number) => {
     }
   });
 };
+
+const upload = (id: number, files: Express.Multer.File[]) => {
+  return new Promise<projects>(async (resolve, reject) => {
+    try {
+      const project = await prisma.projects.update({
+        where: {
+          id: id,
+        },
+        data: {
+          media: {
+            createMany: {
+              skipDuplicates: true,
+              data: files.map((file) => ({
+                name: file.originalname,
+                format: file.mimetype,
+                identifier: file.filename,
+              })),
+            },
+          },
+        },
+      });
+      return resolve(project);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 const find = (id: number) => {
   return new Promise<projects>(async (resolve, reject) => {
     try {
       const project = await prisma.projects.findUnique({
         where: {
           id: id,
+        },
+        select: {
+          id: true,
+          name: true,
+          academicId: true,
+          frontendTechnologyId: true,
+          backendTechnologyId: true,
+          databaseTechnologyId: true,
+          groupId: true,
+          description: true,
+          updatedAt: true,
+          createdAt: true,
+          isVerified: true,
+          verifiedByFacultyId: true,
+          academic: true,
+          frontendTechnology: true,
+          backendTechnology: true,
+          databaseTechnology: true,
+          media: true,
         },
       });
       if (!project) {
@@ -70,7 +117,27 @@ const find = (id: number) => {
 const findMany = () => {
   return new Promise<projects[]>(async (resolve, reject) => {
     try {
-      const projects = await prisma.projects.findMany({});
+      const projects = await prisma.projects.findMany({
+        select: {
+          id: true,
+          name: true,
+          academicId: true,
+          frontendTechnologyId: true,
+          backendTechnologyId: true,
+          databaseTechnologyId: true,
+          groupId: true,
+          description: true,
+          updatedAt: true,
+          createdAt: true,
+          isVerified: true,
+          verifiedByFacultyId: true,
+          academic: true,
+          frontendTechnology: true,
+          backendTechnology: true,
+          databaseTechnology: true,
+          media: true,
+        },
+      });
       return resolve(projects);
     } catch (error) {
       reject(error);
@@ -133,4 +200,5 @@ export default {
   find,
   findMany,
   projectsByStudent,
+  upload,
 };

@@ -12,18 +12,21 @@ model academics {
   sem                Int
   year               Int        @db.Year
   maximumGroupMember Int        @db.TinyInt
-  projects           projects[]
   groups             groups[]
+  projects           projects[]
 
   @@unique([sem, year], map: "sem")
 }
 
 model backendTechnologies {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique(map: "name", length: 20) @db.TinyText
-  createdAt DateTime   @default(now()) @db.Timestamp(0)
-  updatedAt DateTime   @default(now()) @db.Timestamp(0)
-  projects  projects[]
+  id         Int        @id @default(autoincrement())
+  name       String     @unique(map: "name", length: 20) @db.TinyText
+  logo       String     @db.VarChar(300)
+  desciption String     @db.VarChar(2000)
+  url        String     @db.VarChar(300)
+  createdAt  DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt  DateTime   @default(now()) @db.Timestamp(0)
+  projects   projects[]
 }
 
 model branches {
@@ -36,33 +39,38 @@ model branches {
 }
 
 model databaseTechnologies {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique(map: "name", length: 20) @db.TinyText
-  createdAt DateTime   @default(now()) @db.Timestamp(0)
-  updatedAt DateTime   @default(now()) @db.Timestamp(0)
-  projects  projects[]
+  id         Int        @id @default(autoincrement())
+  name       String     @unique(map: "name", length: 20) @db.TinyText
+  logo       String     @db.VarChar(300)
+  desciption String     @db.VarChar(2000)
+  url        String     @db.VarChar(300)
+  createdAt  DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt  DateTime   @default(now()) @db.Timestamp(0)
+  projects   projects[]
 }
 
 model faculty {
-  id                  Int                   @id @default(autoincrement())
-  roleId              Int
-  employeeId          String                @unique(map: "employeeId") @db.VarChar(15)
-  name                String                @db.TinyText
-  password            String                @db.VarChar(60)
-  email               String                @unique(map: "email", length: 60) @db.TinyText
-  number              String                @unique(map: "number", length: 10) @db.TinyText
-  createdById         Int?
-  isBlocked           Boolean               @default(false)
-  createdAt           DateTime              @default(now()) @db.Timestamp(0)
-  updatedAt           DateTime              @default(now()) @db.Timestamp(0)
-  createdBy           faculty?              @relation("facultyTofaculty", fields: [createdById], references: [id], onDelete: Cascade, map: "createdById")
-  other_faculty       faculty[]             @relation("facultyTofaculty")
-  facultyRoles        facultyRoles          @relation(fields: [roleId], references: [id], onDelete: Cascade, map: "roleToFacultyRole")
-  mediaComments       mediaComments[]
-  notifications       notifications[]
-  projectGuideMapping projectGuideMapping[]
-  projects            projects[]
-  tasks               tasks[]
+  id                   Int                    @id @default(autoincrement())
+  roleId               Int
+  employeeId           String                 @unique(map: "employeeId") @db.VarChar(15)
+  name                 String                 @db.TinyText
+  profilePicture       String?                @db.VarChar(300)
+  password             String                 @db.VarChar(60)
+  email                String                 @unique(map: "email", length: 60) @db.TinyText
+  number               String                 @unique(map: "number", length: 10) @db.TinyText
+  createdById          Int?
+  isBlocked            Boolean                @default(false)
+  createdAt            DateTime               @default(now()) @db.Timestamp(0)
+  updatedAt            DateTime               @default(now()) @db.Timestamp(0)
+  createdBy            faculty?               @relation("facultyTofaculty", fields: [createdById], references: [id], onDelete: Cascade, map: "createdById")
+  other_faculty        faculty[]              @relation("facultyTofaculty")
+  facultyRoles         facultyRoles           @relation(fields: [roleId], references: [id], onDelete: Cascade, map: "roleToFacultyRole")
+  mediaComments        mediaComments[]
+  notification_history notification_history[]
+  notifications        notifications[]
+  projectGuideMapping  projectGuideMapping[]
+  projects             projects[]
+  tasks                tasks[]
 
   @@index([createdById], map: "createdBy_idx")
   @@index([roleId], map: "roleToFacultyRole_idx")
@@ -92,11 +100,14 @@ model facultyRoles {
 }
 
 model frontendTechnologies {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique(map: "name", length: 20) @db.TinyText
-  createdAt DateTime   @default(now()) @db.Timestamp(0)
-  updatedAt DateTime   @default(now()) @db.Timestamp(0)
-  projects  projects[]
+  id         Int        @id @default(autoincrement())
+  name       String     @unique(map: "name", length: 20) @db.TinyText
+  logo       String     @db.VarChar(300)
+  desciption String     @db.VarChar(2000)
+  url        String     @db.VarChar(300)
+  createdAt  DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt  DateTime   @default(now()) @db.Timestamp(0)
+  projects   projects[]
 }
 
 model groupParticipants {
@@ -118,13 +129,15 @@ model groupParticipants {
 model groups {
   id                 Int                  @id @default(autoincrement())
   name               String               @unique(map: "name") @db.VarChar(100)
-  academicId         Int
   createdAt          DateTime             @default(now()) @db.Timestamp(0)
   updatedAt          DateTime             @default(now()) @db.Timestamp(0)
-  academic           academics            @relation(fields: [academicId], references: [id], onUpdate: Restrict)
+  academicId         Int
   groupParticipants  groupParticipants[]
+  academic           academics            @relation(fields: [academicId], references: [id], onUpdate: Restrict)
   invitationForGroup invitationForGroup[]
   projects           projects?
+
+  @@index([academicId], map: "groups_academicId_fkey")
 }
 
 model invitationForGroup {
@@ -147,8 +160,8 @@ model invitationForGroup {
 
 model media {
   id            Int             @id @default(autoincrement())
-  identifier    String          @unique(map: "identifier") @db.VarChar(200)
   name          String          @db.TinyText
+  identifier    String          @unique(map: "identifier") @db.VarChar(150)
   projectId     Int
   format        String          @db.TinyText
   isReviewed    Boolean?
@@ -170,6 +183,7 @@ model mediaComments {
   media       media    @relation(fields: [mediaId], references: [id], onUpdate: Restrict, map: "mediaComments_ibfk_2")
 
   @@index([commentedBy], map: "commentedBy")
+  @@index([mediaId], map: "mediaComments_ibfk_2")
 }
 
 model notifications {
@@ -202,7 +216,6 @@ model projects {
   backendTechnologyId  Int?
   databaseTechnologyId Int?
   groupId              Int                   @unique(map: "group_2")
-  abstract             String?               @db.VarChar(500)
   description          String?               @db.VarChar(2000)
   updatedAt            DateTime              @default(now()) @db.Timestamp(0)
   createdAt            DateTime              @default(now()) @db.Timestamp(0)
@@ -227,22 +240,23 @@ model projects {
 }
 
 model students {
-  id                        Int                  @id @default(autoincrement())
-  name                      String               @db.TinyText
-  password                  String               @db.VarChar(60)
-  semester                  Int                  @db.TinyInt
+  id                        Int                    @id @default(autoincrement())
+  password                  String                 @db.VarChar(60)
+  semester                  Int                    @db.TinyInt
+  email                     String                 @unique(map: "email") @db.VarChar(255)
+  number                    String                 @unique(map: "number", length: 10) @db.TinyText
+  createdAt                 DateTime               @default(now()) @db.Timestamp(0)
+  updatedAt                 DateTime               @default(now()) @db.Timestamp(0)
+  name                      String                 @db.TinyText
   branchId                  Int
-  enrollmentNo              String               @unique(map: "enrollementNo", length: 12) @db.TinyText
-  email                     String               @unique(map: "email") @db.VarChar(255)
-  number                    String               @unique(map: "number", length: 10) @db.TinyText
-  createdAt                 DateTime             @default(now()) @db.Timestamp(0)
-  updatedAt                 DateTime             @default(now()) @db.Timestamp(0)
+  enrollmentNo              String                 @unique(map: "enrollementNo", length: 12) @db.TinyText
   groupParticipants         groupParticipants[]
-  toMemberTostudents        invitationForGroup[] @relation("invitationForGroup_toMemberTostudents")
-  fromGroupLeaderTostudents invitationForGroup[] @relation("invitationForGroup_fromGroupLeaderTostudents")
-  branch                    branches             @relation(fields: [branchId], references: [id], onDelete: Cascade, map: "students_ibfk_1")
-  assignedToTostudents      tasks[]              @relation("tasks_assignedToTostudents")
-  createdByMemberTostudents tasks[]              @relation("tasks_createdByMemberTostudents")
+  toMemberTostudents        invitationForGroup[]   @relation("invitationForGroup_toMemberTostudents")
+  fromGroupLeaderTostudents invitationForGroup[]   @relation("invitationForGroup_fromGroupLeaderTostudents")
+  notification_history      notification_history[]
+  branch                    branches               @relation(fields: [branchId], references: [id], onDelete: Cascade, map: "students_ibfk_1")
+  assignedToTostudents      tasks[]                @relation("tasks_assignedToTostudents")
+  createdByMemberTostudents tasks[]                @relation("tasks_createdByMemberTostudents")
 
   @@index([branchId], map: "branch")
 }
@@ -259,7 +273,7 @@ model tasks {
   endTime                 DateTime?    @db.DateTime(0)
   createdByLeaderId       Int?
   createdByFacultyId      Int?
-  assignedToParticipant   students     @relation("tasks_assignedToTostudents", fields: [assignedToParticipantId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "tasks_ibfk_1")
+  assignedToParticipant   students     @relation("tasks_assignedToTostudents", fields: [assignedToParticipantId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_1")
   faculty                 faculty?     @relation(fields: [createdByFacultyId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_2")
   createdByLeader         students?    @relation("tasks_createdByMemberTostudents", fields: [createdByLeaderId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_3")
   project                 projects     @relation(fields: [projectId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_4")
@@ -268,6 +282,21 @@ model tasks {
   @@index([createdByFacultyId], map: "createdByFaculty")
   @@index([createdByLeaderId], map: "createdByMember")
   @@index([projectId], map: "project")
+}
+
+model notification_history {
+  id        Int      @id @default(autoincrement())
+  sentTo    Int
+  sentBy    Int
+  message   String   @db.VarChar(1000)
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  faculty   faculty  @relation(fields: [sentBy], references: [id], onUpdate: Restrict, map: "notification_history_ibfk_1")
+  students  students @relation(fields: [sentTo], references: [id], onUpdate: Restrict, map: "notification_history_ibfk_2")
+
+  @@index([sentBy], map: "sentBy")
+  @@index([sentTo], map: "sentTo")
 }
 
 enum groupParticipants_role {

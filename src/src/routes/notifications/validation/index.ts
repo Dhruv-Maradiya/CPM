@@ -4,7 +4,6 @@ const create = yup
   .object()
   .shape({
     message: yup.string().required(),
-    sentBy: yup.number().required(),
     toUsers: yup.string().required(),
   })
   .noUnknown(true)

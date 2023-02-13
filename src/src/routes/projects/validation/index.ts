@@ -9,7 +9,6 @@ const create = yup
     databaseTechnologyId: yup.number().required(),
     backendTechnologyId: yup.number().required(),
     groupId: yup.number().required(),
-    abstract: yup.string().required(),
     description: yup.string().required(),
   })
   .noUnknown(true)
@@ -25,7 +24,6 @@ const update = yup
     databaseTechnologyId: yup.number().optional(),
     backendTechnologyId: yup.number().optional(),
     groupId: yup.number().optional(),
-    abstract: yup.string().optional(),
     description: yup.string().optional(),
   })
   .noUnknown(true)
