@@ -43,6 +43,11 @@ router.put("/", auth, async (req, res, next) => {
 });
 router.get("/findMany", auth, async (req, res, next) => {
   try {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    const take = req.query["take"] ? Number(req.query["take"]) : 0;
+
     type Body = yup.InferType<typeof validation.findMany>;
     const validatedQuery = await validateSchema<Body>(
       validation.findMany,
@@ -50,7 +55,10 @@ router.get("/findMany", auth, async (req, res, next) => {
       true
     );
     const id = validatedQuery["studentId"]; // validation goes here
-    const task = await Tasks.findMany(id);
+    const task = await Tasks.findMany(id, {
+      skip,
+      take,
+    });
 
     res.locals["data"] = task;
     next();
@@ -60,6 +68,11 @@ router.get("/findMany", auth, async (req, res, next) => {
 });
 router.get("/findManyByProject", auth, async (req, res, next) => {
   try {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    const take = req.query["take"] ? Number(req.query["take"]) : 0;
+
     type Body = yup.InferType<typeof validation.findManyByProject>;
     const validatedQuery = await validateSchema<Body>(
       validation.findManyByProject,
@@ -67,7 +80,7 @@ router.get("/findManyByProject", auth, async (req, res, next) => {
       true
     );
     const id = validatedQuery["projectId"]; // validation goes here
-    const task = await Tasks.findManyByProject(id);
+    const task = await Tasks.findManyByProject(id, { skip, take });
 
     res.locals["data"] = task;
     next();
@@ -77,6 +90,11 @@ router.get("/findManyByProject", auth, async (req, res, next) => {
 });
 router.get("/findManyByProjectFaculty", auth, async (req, res, next) => {
   try {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    const take = req.query["take"] ? Number(req.query["take"]) : 0;
+
     type Body = yup.InferType<typeof validation.findManyByProjectFaculty>;
     const validatedQuery = await validateSchema<Body>(
       validation.findManyByProjectFaculty,
@@ -84,7 +102,7 @@ router.get("/findManyByProjectFaculty", auth, async (req, res, next) => {
       true
     );
     const id = validatedQuery["facultyId"]; // validation goes here
-    const task = await Tasks.findMany(id);
+    const task = await Tasks.findMany(id, { skip, take });
 
     res.locals["data"] = task;
     next();

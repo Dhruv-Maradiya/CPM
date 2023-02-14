@@ -23,6 +23,15 @@ type ProjectByStudentResponse = {
   };
 };
 
+type FindManyArgs = {
+  take: number;
+  skip: number;
+};
+type FindManyResponse = {
+  projects: projects[];
+  count: number;
+};
+
 const create = (data: Prisma.projectsUncheckedCreateInput) => {
   return new Promise<projects>(async (resolve, reject) => {
     try {
@@ -116,33 +125,39 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = () => {
-  return new Promise<projects[]>(async (resolve, reject) => {
+const findMany = ({ take, skip }: FindManyArgs) => {
+  return new Promise<FindManyResponse>(async (resolve, reject) => {
     try {
-      const projects = await prisma.projects.findMany({
-        select: {
-          id: true,
-          name: true,
-          categoryId: true,
-          academicId: true,
-          frontendTechnologyId: true,
-          backendTechnologyId: true,
-          databaseTechnologyId: true,
-          groupId: true,
-          description: true,
-          updatedAt: true,
-          createdAt: true,
-          isVerified: true,
-          verifiedByFacultyId: true,
-          academic: true,
-          frontendTechnology: true,
-          backendTechnology: true,
-          databaseTechnology: true,
-          media: true,
-          category: true,
-        },
-      });
-      return resolve(projects);
+      const [projects, count] = await Promise.all([
+        prisma.projects.findMany({
+          select: {
+            id: true,
+            name: true,
+            categoryId: true,
+            academicId: true,
+            frontendTechnologyId: true,
+            backendTechnologyId: true,
+            databaseTechnologyId: true,
+            groupId: true,
+            description: true,
+            updatedAt: true,
+            createdAt: true,
+            isVerified: true,
+            verifiedByFacultyId: true,
+            academic: true,
+            frontendTechnology: true,
+            backendTechnology: true,
+            databaseTechnology: true,
+            media: true,
+            category: true,
+          },
+          take: take,
+          skip: skip,
+        }),
+        prisma.projects.count({}),
+      ]);
+
+      return resolve({ projects, count });
     } catch (error) {
       reject(error);
     }
