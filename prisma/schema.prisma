@@ -19,14 +19,14 @@ model academics {
 }
 
 model backendTechnologies {
-  id         Int        @id @default(autoincrement())
-  name       String     @unique(map: "name", length: 20) @db.TinyText
-  logo       String     @db.VarChar(300)
-  desciption String     @db.VarChar(2000)
-  url        String     @db.VarChar(300)
-  createdAt  DateTime   @default(now()) @db.Timestamp(0)
-  updatedAt  DateTime   @default(now()) @db.Timestamp(0)
-  projects   projects[]
+  id          Int        @id @default(autoincrement())
+  name        String     @unique(map: "name", length: 20) @db.TinyText
+  logo        String     @db.VarChar(300)
+  description String     @db.VarChar(2000)
+  url         String     @db.VarChar(300)
+  createdAt   DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime   @default(now()) @db.Timestamp(0)
+  projects    projects[]
 }
 
 model branches {
@@ -39,14 +39,14 @@ model branches {
 }
 
 model databaseTechnologies {
-  id         Int        @id @default(autoincrement())
-  name       String     @unique(map: "name", length: 20) @db.TinyText
-  logo       String     @db.VarChar(300)
-  desciption String     @db.VarChar(2000)
-  url        String     @db.VarChar(300)
-  createdAt  DateTime   @default(now()) @db.Timestamp(0)
-  updatedAt  DateTime   @default(now()) @db.Timestamp(0)
-  projects   projects[]
+  id          Int        @id @default(autoincrement())
+  name        String     @unique(map: "name", length: 20) @db.TinyText
+  logo        String     @db.VarChar(300)
+  description String     @db.VarChar(2000)
+  url         String     @db.VarChar(300)
+  createdAt   DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime   @default(now()) @db.Timestamp(0)
+  projects    projects[]
 }
 
 model faculty {
@@ -100,14 +100,14 @@ model facultyRoles {
 }
 
 model frontendTechnologies {
-  id         Int        @id @default(autoincrement())
-  name       String     @unique(map: "name", length: 20) @db.TinyText
-  logo       String     @db.VarChar(300)
-  desciption String     @db.VarChar(2000)
-  url        String     @db.VarChar(300)
-  createdAt  DateTime   @default(now()) @db.Timestamp(0)
-  updatedAt  DateTime   @default(now()) @db.Timestamp(0)
-  projects   projects[]
+  id          Int        @id @default(autoincrement())
+  name        String     @unique(map: "name", length: 20) @db.TinyText
+  logo        String     @db.VarChar(300)
+  description String     @db.VarChar(2000)
+  url         String     @db.VarChar(300)
+  createdAt   DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime   @default(now()) @db.Timestamp(0)
+  projects    projects[]
 }
 
 model groupParticipants {
@@ -212,6 +212,7 @@ model projects {
   id                   Int                   @id @default(autoincrement())
   name                 String                @unique(map: "name") @db.VarChar(100)
   academicId           Int
+  categoryId           Int
   frontendTechnologyId Int?
   backendTechnologyId  Int?
   databaseTechnologyId Int?
@@ -229,6 +230,7 @@ model projects {
   databaseTechnology   databaseTechnologies? @relation(fields: [databaseTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_4")
   frontendTechnology   frontendTechnologies? @relation(fields: [frontendTechnologyId], references: [id], onUpdate: Restrict, map: "projects_ibfk_5")
   faculty              faculty?              @relation(fields: [verifiedByFacultyId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "projects_ibfk_6")
+  category             category              @relation(fields: [categoryId], references: [id], onUpdate: Restrict, map: "projects_ibfk_7")
   tasks                tasks[]
 
   @@index([academicId], map: "academic")
@@ -237,6 +239,7 @@ model projects {
   @@index([frontendTechnologyId], map: "frontendTechnology")
   @@index([groupId], map: "group")
   @@index([verifiedByFacultyId], map: "verifyBy")
+  @@index([categoryId], map: "categoryId")
 }
 
 model students {
@@ -297,6 +300,14 @@ model notification_history {
 
   @@index([sentBy], map: "sentBy")
   @@index([sentTo], map: "sentTo")
+}
+
+model category {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique(map: "name", length: 30) @db.Text
+  createdAt DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt DateTime   @default(now()) @db.Timestamp(0)
+  projects  projects[]
 }
 
 enum groupParticipants_role {

@@ -88,6 +88,7 @@ const find = (id: number) => {
         select: {
           id: true,
           name: true,
+          categoryId: true,
           academicId: true,
           frontendTechnologyId: true,
           backendTechnologyId: true,
@@ -103,6 +104,7 @@ const find = (id: number) => {
           backendTechnology: true,
           databaseTechnology: true,
           media: true,
+          category: true,
         },
       });
       if (!project) {
@@ -121,6 +123,7 @@ const findMany = () => {
         select: {
           id: true,
           name: true,
+          categoryId: true,
           academicId: true,
           frontendTechnologyId: true,
           backendTechnologyId: true,
@@ -136,6 +139,7 @@ const findMany = () => {
           backendTechnology: true,
           databaseTechnology: true,
           media: true,
+          category: true,
         },
       });
       return resolve(projects);
