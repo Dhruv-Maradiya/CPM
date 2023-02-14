@@ -20,7 +20,9 @@ router.get(
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       const take = req.query["take"] ? Number(req.query["take"]) : 10;
 
-      if (res.locals["user"] !== null) {
+      console.log(res.locals["user"]);
+
+      if (res.locals["user"] !== null && res.locals["user"] !== undefined) {
         const userId = res.locals["user"].userDetails.id;
         const unreadNotifications = await prisma.notification_history.count({
           where: {
