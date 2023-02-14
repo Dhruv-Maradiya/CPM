@@ -7,6 +7,10 @@ type LoginResponse = {
   token: string;
   userId: number;
 };
+type FindManyArgs = {
+  take?: number;
+  skip?: number;
+};
 
 const create = (data: Prisma.facultyUncheckedCreateInput) => {
   return new Promise<faculty>(async (resolve, reject) => {
@@ -53,11 +57,18 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = () => {
-  return new Promise<faculty[]>(async (resolve, reject) => {
+const findMany = ({ take, skip }: FindManyArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const faculties = await prisma.faculty.findMany({});
-      return resolve(faculties);
+      // const faculties = await prisma.faculty.findMany({});
+      const [faculties, count] = await Promise.all([
+        prisma.faculty.findMany({
+          take: take ?? 10,
+          skip: skip ?? 0,
+        }),
+        prisma.faculty.count(),
+      ]);
+      return resolve({ faculties: faculties, count: count });
     } catch (error) {
       reject(error);
     }

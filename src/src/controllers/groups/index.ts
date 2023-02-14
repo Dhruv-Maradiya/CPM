@@ -3,6 +3,11 @@ import { prisma } from "../../../utils/index.js";
 import { Prisma, groups, PrismaClient } from "@prisma/client";
 import { MethodNotAllowed, NotFoundError } from "../../../exceptions/index.js";
 
+type FindManyArgs = {
+  take?: number;
+  skip?: number;
+};
+
 const create = (
   data: Prisma.groupsUncheckedCreateInput,
   transaction: Prisma.TransactionClient | undefined
@@ -62,11 +67,17 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = () => {
-  return new Promise<groups[]>(async (resolve, reject) => {
+const findMany = ({ skip, take }: FindManyArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const groups = await prisma.groups.findMany({});
-      return resolve(groups);
+      const [groups, count] = await Promise.all([
+        prisma.groups.findMany({
+          take: take ?? 10,
+          skip: skip ?? 0,
+        }),
+        prisma.groups.count(),
+      ]);
+      return resolve({ groups, count });
     } catch (error) {
       reject(error);
     }

@@ -62,7 +62,14 @@ router.get("/find", auth, async (req, res, next) => {
 });
 router.get("/findMany", auth, async (_req, res, next) => {
   try {
-    const faculties = await Faculty.findMany();
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    const take = _req.query["take"] ? Number(_req.query["take"]) : 10;
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    const skip = _req.query["skip"] ? Number(_req.query["skip"]) : 0;
+    const faculties = await Faculty.findMany({
+      take: take,
+      skip: skip,
+    });
 
     res.locals["data"] = faculties;
     next();

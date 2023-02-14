@@ -17,6 +17,7 @@ import Projects from "./src/routes/projects/index.js";
 import Tasks from "./src/routes/tasks/index.js";
 import Students from "./src/routes/students/index.js";
 import Categories from "./src/routes/categories/index.js";
+import Home from "./src/routes/home/index.js";
 import url from "url";
 import {
   errorHandler as exceptionMiddleware,
@@ -64,6 +65,7 @@ app.use("/api/v1/project", Projects);
 app.use("/api/v1/student", Students);
 app.use("/api/v1/task", Tasks);
 app.use("/api/v1/category", Categories);
+app.use("/api/v1/home", Home);
 
 //
 // ########## MIDDLEWARE ##########

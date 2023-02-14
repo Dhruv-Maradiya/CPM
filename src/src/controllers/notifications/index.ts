@@ -49,6 +49,7 @@ const findManyByStudent = (studentId: number) => {
       const notifications = await prisma.notification_history.findMany({
         where: {
           sentTo: studentId,
+          isRead: false,
         },
         select: {
           sentBy: true,
