@@ -3,6 +3,18 @@ import { prisma } from "../../../utils/index.js";
 import { Prisma, academics } from "@prisma/client";
 import { NotFoundError } from "../../../exceptions/index.js";
 
+type FindManyArgs = {
+  select?: Prisma.academicsSelect;
+  where?: Prisma.academicsWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.academicsOrderByWithRelationInput>;
+  take?: number;
+  skip?: number;
+};
+type FindOneArgs = {
+  select: Prisma.academicsSelect;
+  where: Prisma.academicsWhereUniqueInput;
+};
+
 const create = (data: Prisma.academicsUncheckedCreateInput) => {
   return new Promise<academics>(async (resolve, reject) => {
     try {
@@ -30,13 +42,12 @@ const update = (data: Prisma.academicsUpdateInput, id: number) => {
     }
   });
 };
-const find = (id: number) => {
-  return new Promise<academics>(async (resolve, reject) => {
+const find = ({ select, where }: FindOneArgs) => {
+  return new Promise<Partial<academics>>(async (resolve, reject) => {
     try {
       const academics = await prisma.academics.findUnique({
-        where: {
-          id: id,
-        },
+        where: where,
+        select: select,
       });
       if (!academics) {
         throw new NotFoundError("academics not found");
@@ -47,10 +58,16 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = () => {
+const findMany = ({ select, where, orderBy, skip, take }: FindManyArgs) => {
   return new Promise<academics[]>(async (resolve, reject) => {
     try {
-      const academics = await prisma.academics.findMany({});
+      const academics = await prisma.academics.findMany({
+        ...(where ? { where: where } : {}),
+        ...(select ? { select: select } : {}),
+        ...(orderBy ? { orderBy: orderBy } : {}),
+        ...(skip != null ? { skip: skip } : {}),
+        ...(take != null ? { take: take } : {}),
+      });
       return resolve(academics);
     } catch (error) {
       reject(error);

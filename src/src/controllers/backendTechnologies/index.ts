@@ -3,6 +3,18 @@ import { prisma } from "../../../utils/index.js";
 import { Prisma, backendTechnologies } from "@prisma/client";
 import { NotFoundError } from "../../../exceptions/index.js";
 
+type FindManyArgs = {
+  select?: Prisma.backendTechnologiesSelect;
+  where?: Prisma.backendTechnologiesWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.backendTechnologiesOrderByWithRelationInput>;
+  take?: number;
+  skip?: number;
+};
+type FindOneArgs = {
+  select: Prisma.backendTechnologiesSelect;
+  where: Prisma.backendTechnologiesWhereUniqueInput;
+};
+
 const create = (data: Prisma.backendTechnologiesUncheckedCreateInput) => {
   return new Promise<backendTechnologies>(async (resolve, reject) => {
     try {
@@ -30,13 +42,13 @@ const update = (data: Prisma.backendTechnologiesUpdateInput, id: number) => {
     }
   });
 };
-const find = (id: number) => {
-  return new Promise<backendTechnologies>(async (resolve, reject) => {
+const find = ({ select, where }: FindOneArgs) => {
+  return new Promise<Partial<backendTechnologies>>(async (resolve, reject) => {
     try {
       const backendTechnology = await prisma.backendTechnologies.findUnique({
-        where: {
-          id: id,
-        },
+        where: where,
+
+        select: select,
       });
       if (!backendTechnology) {
         throw new NotFoundError("backendTechnology not found");
@@ -47,10 +59,16 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = () => {
+const findMany = ({ select, where, orderBy, take, skip }: FindManyArgs) => {
   return new Promise<backendTechnologies[]>(async (resolve, reject) => {
     try {
-      const backendTechnologies = await prisma.backendTechnologies.findMany({});
+      const backendTechnologies = await prisma.backendTechnologies.findMany({
+        ...(where ? { where: where } : {}),
+        ...(select ? { select: select } : {}),
+        ...(orderBy ? { orderBy: orderBy } : {}),
+        ...(take != null ? { take: take } : {}),
+        ...(skip != null ? { skip: skip } : {}),
+      });
       return resolve(backendTechnologies);
     } catch (error) {
       reject(error);
