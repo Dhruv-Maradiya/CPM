@@ -10,6 +10,23 @@ type findManyByProjectFacultyReturnType = tasks & {
   project: projects;
 };
 
+type FindManyArgs = {
+  take: number;
+  skip: number;
+};
+type FindManyResp = {
+  tasks: tasks[];
+  count: number;
+};
+type FindManyByProjectResp = {
+  tasks: findManyByProjectReturnType[];
+  count: number;
+};
+type FindManyByProjectGuideResp = {
+  tasks: findManyByProjectFacultyReturnType[];
+  count: number;
+};
+
 const create = (data: Prisma.tasksUncheckedCreateInput) => {
   return new Promise<tasks>(async (resolve, reject) => {
     try {
@@ -37,42 +54,55 @@ const update = (data: Prisma.tasksUpdateInput, id: number) => {
     }
   });
 };
-const findMany = (studentId: number) => {
-  return new Promise<tasks[]>(async (resolve, reject) => {
+const findMany = (studentId: number, { skip, take }: FindManyArgs) => {
+  return new Promise<FindManyResp>(async (resolve, reject) => {
     try {
-      const tasks = await prisma.tasks.findMany({
-        where: {
-          assignedToParticipantId: studentId,
-        },
-      });
-      return resolve(tasks);
+      const [tasks, count] = await Promise.all([
+        prisma.tasks.findMany({
+          where: {
+            assignedToParticipantId: studentId,
+          },
+          skip,
+          take,
+        }),
+        prisma.tasks.count({}),
+      ]);
+      return resolve({ tasks, count });
     } catch (error) {
       reject(error);
     }
   });
 };
-const findManyByProject = (projectId: number) => {
-  return new Promise<findManyByProjectReturnType[]>(async (resolve, reject) => {
+const findManyByProject = (projectId: number, { skip, take }: FindManyArgs) => {
+  return new Promise<FindManyByProjectResp>(async (resolve, reject) => {
     try {
-      const tasks = await prisma.tasks.findMany({
-        where: {
-          projectId: projectId,
-        },
-        include: {
-          assignedToParticipant: true,
-        },
-      });
-      return resolve(tasks);
+      const [tasks, count] = await Promise.all([
+        prisma.tasks.findMany({
+          where: {
+            projectId: projectId,
+          },
+          include: {
+            assignedToParticipant: true,
+          },
+          skip,
+          take,
+        }),
+        prisma.tasks.count({}),
+      ]);
+      return resolve({ tasks, count });
     } catch (error) {
       reject(error);
     }
   });
 };
-const findManyByProjectGuide = (facultyId: number) => {
-  return new Promise<findManyByProjectFacultyReturnType[]>(
-    async (resolve, reject) => {
-      try {
-        const tasks = await prisma.tasks.findMany({
+const findManyByProjectGuide = (
+  facultyId: number,
+  { skip, take }: FindManyArgs
+) => {
+  return new Promise<FindManyByProjectGuideResp>(async (resolve, reject) => {
+    try {
+      const [tasks, count] = await Promise.all([
+        prisma.tasks.findMany({
           where: {
             project: {
               projectGuideMapping: {
@@ -86,13 +116,16 @@ const findManyByProjectGuide = (facultyId: number) => {
             assignedToParticipant: true,
             project: true,
           },
-        });
-        return resolve(tasks);
-      } catch (error) {
-        reject(error);
-      }
+          skip,
+          take,
+        }),
+        prisma.tasks.count({}),
+      ]);
+      return resolve({ tasks, count });
+    } catch (error) {
+      reject(error);
     }
-  );
+  });
 };
 
 export default {
