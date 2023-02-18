@@ -51,7 +51,16 @@ router.get("/find", async (req, res, next) => {
       true
     );
     const id = validatedQuery["id"];
-    const branch = await Branches.find(id);
+    const branch = await Branches.find({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        displayName: true,
+      },
+    });
 
     res.locals["data"] = branch;
     next();
@@ -61,7 +70,13 @@ router.get("/find", async (req, res, next) => {
 });
 router.get("/findMany", async (_req, res, next) => {
   try {
-    const branches = await Branches.findMany();
+    const branches = await Branches.findMany({
+      select: {
+        id: true,
+        name: true,
+        displayName: true,
+      },
+    });
 
     res.locals["data"] = branches;
     next();

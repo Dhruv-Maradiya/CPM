@@ -244,6 +244,7 @@ model projects {
 
 model students {
   id                        Int                    @id @default(autoincrement())
+  profilePicture            String?                @db.VarChar(500)
   password                  String                 @db.VarChar(60)
   semester                  Int                    @db.TinyInt
   email                     String                 @unique(map: "email") @db.VarChar(255)

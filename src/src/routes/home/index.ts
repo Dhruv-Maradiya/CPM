@@ -20,8 +20,6 @@ router.get(
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       const take = req.query["take"] ? Number(req.query["take"]) : 10;
 
-      console.log(res.locals["user"]);
-
       if (res.locals["user"] !== null && res.locals["user"] !== undefined) {
         const userId = res.locals["user"].userDetails.id;
         const unreadNotifications = await prisma.notification_history.count({
@@ -40,6 +38,80 @@ router.get(
       const projects = await Projects.findMany({
         take,
         skip,
+        select: {
+          id: true,
+          name: true,
+          academic: {
+            select: {
+              id: true,
+              sem: true,
+              year: true,
+              maximumGroupMember: true,
+            },
+          },
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          frontendTechnology: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              description: true,
+              url: true,
+            },
+          },
+          databaseTechnology: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              description: true,
+              url: true,
+            },
+          },
+          backendTechnology: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              description: true,
+              url: true,
+            },
+          },
+          isVerified: true,
+          description: true,
+          media: {
+            select: {
+              id: true,
+              format: true,
+              identifier: true,
+              name: true,
+            },
+          },
+          group: {
+            select: {
+              id: true,
+              name: true,
+              groupParticipants: {
+                select: {
+                  id: true,
+                  role: true,
+                  student: {
+                    select: {
+                      id: true,
+                      name: true,
+                      enrollmentNo: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
 
       res.locals["data"] = {

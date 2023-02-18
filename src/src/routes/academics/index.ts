@@ -52,7 +52,17 @@ router.get("/find", async (req, res, next) => {
       true
     );
     const id = validatedQuery["id"]; // validation goes here
-    const academics = await Academics.find(id);
+    const academics = await Academics.find({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        maximumGroupMember: true,
+        sem: true,
+        year: true,
+      },
+    });
 
     res.locals["data"] = academics;
     next();
@@ -62,7 +72,14 @@ router.get("/find", async (req, res, next) => {
 });
 router.get("/findMany", async (_req, res, next) => {
   try {
-    const academics = await Academics.findMany();
+    const academics = await Academics.findMany({
+      select: {
+        id: true,
+        maximumGroupMember: true,
+        sem: true,
+        year: true,
+      },
+    });
 
     res.locals["data"] = academics;
     next();

@@ -8,16 +8,50 @@ type LoginResponse = {
   userId: number;
 };
 type FindManyArgs = {
+  select?: Prisma.facultySelect;
+  where?: Prisma.facultyWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.facultyOrderByWithRelationInput>;
   take?: number;
   skip?: number;
 };
+type FindOneArgs = {
+  select: Prisma.facultySelect;
+  where: Prisma.facultyWhereUniqueInput;
+};
 
 const create = (data: Prisma.facultyUncheckedCreateInput) => {
-  return new Promise<faculty>(async (resolve, reject) => {
+  return new Promise<{
+    number: string;
+    employeeId: string;
+    profilePicture: string | null;
+    email: string;
+    createdAt: Date;
+    updatedAt: Date;
+    facultyRoles: {
+      name: string;
+      id: number;
+    };
+    id: number;
+  }>(async (resolve, reject) => {
     try {
       data.password = await hash(data.password);
       const faculty = await prisma.faculty.create({
         data: data,
+        select: {
+          id: true,
+          facultyRoles: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          email: true,
+          employeeId: true,
+          profilePicture: true,
+          number: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       });
       return resolve(faculty);
     } catch (error) {
@@ -26,12 +60,39 @@ const create = (data: Prisma.facultyUncheckedCreateInput) => {
   });
 };
 const update = (data: Prisma.facultyUpdateInput, id: number) => {
-  return new Promise<faculty>(async (resolve, reject) => {
+  return new Promise<{
+    number: string;
+    employeeId: string;
+    profilePicture: string | null;
+    email: string;
+    createdAt: Date;
+    updatedAt: Date;
+    facultyRoles: {
+      name: string;
+      id: number;
+    };
+    id: number;
+  }>(async (resolve, reject) => {
     try {
       const faculty = await prisma.faculty.update({
         data: data,
         where: {
           id: id,
+        },
+        select: {
+          id: true,
+          facultyRoles: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          email: true,
+          employeeId: true,
+          profilePicture: true,
+          number: true,
+          createdAt: true,
+          updatedAt: true,
         },
       });
       return resolve(faculty);
@@ -40,13 +101,12 @@ const update = (data: Prisma.facultyUpdateInput, id: number) => {
     }
   });
 };
-const find = (id: number) => {
-  return new Promise<faculty>(async (resolve, reject) => {
+const find = ({ select, where }: FindOneArgs) => {
+  return new Promise<Partial<faculty>>(async (resolve, reject) => {
     try {
       const faculty = await prisma.faculty.findUnique({
-        where: {
-          id: id,
-        },
+        where: where,
+        select: select,
       });
       if (!faculty) {
         throw new NotFoundError("faculty not found");
@@ -57,14 +117,17 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = ({ take, skip }: FindManyArgs) => {
+const findMany = ({ take, skip, select, where, orderBy }: FindManyArgs) => {
   return new Promise(async (resolve, reject) => {
     try {
       // const faculties = await prisma.faculty.findMany({});
       const [faculties, count] = await Promise.all([
         prisma.faculty.findMany({
-          take: take ?? 10,
-          skip: skip ?? 0,
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
         }),
         prisma.faculty.count(),
       ]);

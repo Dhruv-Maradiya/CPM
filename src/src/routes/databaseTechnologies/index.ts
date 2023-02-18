@@ -83,7 +83,16 @@ router.get("/find", async (req, res, next) => {
       true
     );
     const id = validatedQuery["id"]; // validation goes here
-    const databaseTechnology = await DatabaseTechnologies.find(id);
+    const databaseTechnology = await DatabaseTechnologies.find({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        name: true,
+        url: true,
+      },
+    });
 
     res.locals["data"] = databaseTechnology;
     next();
@@ -93,7 +102,13 @@ router.get("/find", async (req, res, next) => {
 });
 router.get("/findMany", async (_req, res, next) => {
   try {
-    const databaseTechnologies = await DatabaseTechnologies.findMany();
+    const databaseTechnologies = await DatabaseTechnologies.findMany({
+      select: {
+        id: true,
+        name: true,
+        url: true,
+      },
+    });
 
     res.locals["data"] = databaseTechnologies;
     next();

@@ -59,16 +59,19 @@ const find = ({ select, where }: FindOneArgs) => {
   });
 };
 const findMany = ({ select, where, orderBy, skip, take }: FindManyArgs) => {
-  return new Promise<academics[]>(async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const academics = await prisma.academics.findMany({
-        ...(where ? { where: where } : {}),
-        ...(select ? { select: select } : {}),
-        ...(orderBy ? { orderBy: orderBy } : {}),
-        ...(skip != null ? { skip: skip } : {}),
-        ...(take != null ? { take: take } : {}),
-      });
-      return resolve(academics);
+      const [academics, count] = await Promise.all([
+        prisma.academics.findMany({
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
+        }),
+        prisma.academics.count(),
+      ]);
+      return resolve({ academics, count });
     } catch (error) {
       reject(error);
     }

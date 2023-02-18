@@ -3,6 +3,18 @@ import { prisma } from "../../../utils/index.js";
 import { Prisma, databaseTechnologies } from "@prisma/client";
 import { NotFoundError } from "../../../exceptions/index.js";
 
+type FindManyArgs = {
+  select?: Prisma.databaseTechnologiesSelect;
+  where?: Prisma.databaseTechnologiesWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.databaseTechnologiesOrderByWithRelationInput>;
+  take?: number;
+  skip?: number;
+};
+type FindOneArgs = {
+  select: Prisma.databaseTechnologiesSelect;
+  where: Prisma.databaseTechnologiesWhereUniqueInput;
+};
+
 const create = (data: Prisma.databaseTechnologiesUncheckedCreateInput) => {
   return new Promise<databaseTechnologies>(async (resolve, reject) => {
     try {
@@ -30,13 +42,12 @@ const update = (data: Prisma.databaseTechnologiesUpdateInput, id: number) => {
     }
   });
 };
-const find = (id: number) => {
-  return new Promise<databaseTechnologies>(async (resolve, reject) => {
+const find = ({ select, where }: FindOneArgs) => {
+  return new Promise<Partial<databaseTechnologies>>(async (resolve, reject) => {
     try {
       const databaseTechnology = await prisma.databaseTechnologies.findUnique({
-        where: {
-          id: id,
-        },
+        where: where,
+        select: select,
       });
       if (!databaseTechnology) {
         throw new NotFoundError("databaseTechnology not found");
@@ -47,13 +58,20 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = () => {
-  return new Promise<databaseTechnologies[]>(async (resolve, reject) => {
+const findMany = ({ select, where, orderBy, skip, take }: FindManyArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const databaseTechnologies = await prisma.databaseTechnologies.findMany(
-        {}
-      );
-      return resolve(databaseTechnologies);
+      const [databaseTechnologies, count] = await Promise.all([
+        prisma.databaseTechnologies.findMany({
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
+        }),
+        prisma.databaseTechnologies.count(),
+      ]);
+      return resolve({ databaseTechnologies, count });
     } catch (error) {
       reject(error);
     }

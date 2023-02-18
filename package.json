@@ -9,7 +9,7 @@
   "scripts": {
     "develop": "nodemon ./build/index.js",
     "start": "node ./build/index.js",
-    "build": "tsc && node ./build/index.js"
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

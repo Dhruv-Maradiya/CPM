@@ -3,6 +3,14 @@ import { prisma } from "../../../utils/index.js";
 import { Prisma, invitationForGroup } from "@prisma/client";
 import { NotFoundError, ValidationError } from "../../../exceptions/index.js";
 
+type FindManyArgs = {
+  select?: Prisma.invitationForGroupSelect;
+  where?: Prisma.invitationForGroupWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.invitationForGroupOrderByWithRelationInput>;
+  take?: number;
+  skip?: number;
+};
+
 const create = (data: Prisma.invitationForGroupUncheckedCreateInput) => {
   return new Promise<invitationForGroup>(async (resolve, reject) => {
     try {
@@ -125,10 +133,30 @@ const findManyByLeader = (leaderId: number) => {
     }
   });
 };
+const findMany = ({ select, where, skip, take, orderBy }: FindManyArgs) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [invitationForGroup, count] = await Promise.all([
+        prisma.invitationForGroup.findMany({
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
+        }),
+        prisma.invitationForGroup.count(),
+      ]);
+      return resolve({ invitationForGroup, count });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 export default {
   create,
   updateStatus,
   findManyByStudent,
   findManyByLeader,
+  findMany,
 };

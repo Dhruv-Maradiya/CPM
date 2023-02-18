@@ -59,16 +59,19 @@ const find = ({ select, where }: FindOneArgs) => {
   });
 };
 const findMany = ({ select, where, skip, take, orderBy }: FindManyArgs) => {
-  return new Promise<branches[]>(async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const branches = await prisma.branches.findMany({
-        ...(where ? { where: where } : {}),
-        ...(select ? { select: select } : {}),
-        ...(skip != null ? { skip: skip } : {}),
-        ...(take != null ? { take: take } : {}),
-        ...(orderBy ? { orderBy: orderBy } : {}),
-      });
-      return resolve(branches);
+      const [branches, count] = await Promise.all([
+        prisma.branches.findMany({
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
+        }),
+        prisma.branches.count(),
+      ]);
+      return resolve({ branches, count });
     } catch (error) {
       reject(error);
     }

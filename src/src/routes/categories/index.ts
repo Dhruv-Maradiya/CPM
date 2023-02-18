@@ -51,7 +51,15 @@ router.get("/find", async (req, res, next) => {
       true
     );
     const id = validatedQuery["id"];
-    const category = await Category.find(id);
+    const category = await Category.find({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
     res.locals["data"] = category;
     next();
@@ -61,7 +69,12 @@ router.get("/find", async (req, res, next) => {
 });
 router.get("/findMany", async (_req, res, next) => {
   try {
-    const categories = await Category.findMany();
+    const categories = await Category.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
     res.locals["data"] = categories;
     next();

@@ -1,6 +1,21 @@
 /* eslint-disable no-async-promise-executor */
 import { prisma } from "../../../utils/index.js";
-import { Prisma, notifications, notification_history } from "@prisma/client";
+import { Prisma, notifications } from "@prisma/client";
+
+type FindManyNotificationsArgs = {
+  select?: Prisma.notificationsSelect;
+  where?: Prisma.notificationsWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.notificationsOrderByWithRelationInput>;
+  take?: number;
+  skip?: number;
+};
+type FindManyNotificationHistoryArgs = {
+  select?: Prisma.notification_historySelect;
+  where?: Prisma.notification_historyWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.notification_historyOrderByWithRelationInput>;
+  take?: number;
+  skip?: number;
+};
 
 const create = (data: Prisma.notificationsUncheckedCreateInput) => {
   return new Promise<notifications>(async (resolve, reject) => {
@@ -29,39 +44,66 @@ const create = (data: Prisma.notificationsUncheckedCreateInput) => {
     }
   });
 };
-const findManyByFaculty = (facultyId: number) => {
-  return new Promise<notifications[]>(async (resolve, reject) => {
+const findManyByFaculty = ({
+  select,
+  where,
+  skip,
+  take,
+  orderBy,
+}: FindManyNotificationsArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const notifications = await prisma.notifications.findMany({
-        where: {
-          sentBy: facultyId,
-        },
-      });
-      return resolve(notifications);
+      const [notifications, count] = await Promise.all([
+        prisma.notifications.findMany({
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
+        }),
+        prisma.notifications.count(),
+      ]);
+      return resolve({ notifications, count });
     } catch (error) {
       reject(error);
     }
   });
 };
-const findManyByStudent = (studentId: number) => {
-  return new Promise<notification_history[]>(async (resolve, reject) => {
+const findManyByStudent = ({
+  select,
+  where,
+  skip,
+  take,
+  orderBy,
+}: FindManyNotificationHistoryArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const notifications = await prisma.notification_history.findMany({
-        where: {
-          sentTo: studentId,
-          isRead: false,
-        },
-        select: {
-          sentBy: true,
-          sentTo: true,
-          message: true,
-          isRead: true,
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
-      return resolve(notifications);
+      // const notifications = await prisma.notification_history.findMany({
+      //   where: {
+      //     sentTo: studentId,
+      //     isRead: false,
+      //   },
+      //   select: {
+      //     sentBy: true,
+      //     sentTo: true,
+      //     message: true,
+      //     isRead: true,
+      //     id: true,
+      //     createdAt: true,
+      //     updatedAt: true,
+      //   },
+      // });
+      const [notifications, count] = await Promise.all([
+        prisma.notification_history.findMany({
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
+        }),
+        prisma.notification_history.count(),
+      ]);
+      return resolve({ notifications, count });
     } catch (error) {
       reject(error);
     }

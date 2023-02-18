@@ -7,21 +7,58 @@ type LoginResponse = {
   token: string;
   userId: number;
 };
-type FindManyArgs = {
-  take: number;
-  skip: number;
-};
 type FindManyResponse = {
   students: students[];
   count: number;
 };
 
+type FindManyArgs = {
+  select?: Prisma.studentsSelect;
+  where?: Prisma.studentsWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.studentsOrderByWithRelationInput>;
+  take?: number;
+  skip?: number;
+};
+type FindOneArgs = {
+  select: Prisma.studentsSelect;
+  where: Prisma.studentsWhereUniqueInput;
+};
+
 const create = (data: Prisma.studentsUncheckedCreateInput) => {
-  return new Promise<students>(async (resolve, reject) => {
+  return new Promise<{
+    number: string;
+    name: string;
+    semester: number;
+    enrollmentNo: string;
+    email: string;
+    id: number;
+    profilePicture: string | null;
+    branch: {
+      name: string;
+      id: number;
+      displayName: string;
+    };
+  }>(async (resolve, reject) => {
     try {
       data.password = await hash(data.password);
       const student = await prisma.students.create({
         data: data,
+        select: {
+          id: true,
+          enrollmentNo: true,
+          profilePicture: true,
+          name: true,
+          email: true,
+          branch: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+            },
+          },
+          number: true,
+          semester: true,
+        },
       });
       return resolve(student);
     } catch (error) {
@@ -30,12 +67,28 @@ const create = (data: Prisma.studentsUncheckedCreateInput) => {
   });
 };
 const update = (data: Prisma.studentsUpdateInput, id: number) => {
-  return new Promise<students>(async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const student = await prisma.students.update({
         data: data,
         where: {
           id: id,
+        },
+        select: {
+          id: true,
+          enrollmentNo: true,
+          profilePicture: true,
+          name: true,
+          email: true,
+          branch: {
+            select: {
+              id: true,
+              name: true,
+              displayName: true,
+            },
+          },
+          number: true,
+          semester: true,
         },
       });
       return resolve(student);
@@ -44,13 +97,12 @@ const update = (data: Prisma.studentsUpdateInput, id: number) => {
     }
   });
 };
-const find = (id: number) => {
-  return new Promise<students>(async (resolve, reject) => {
+const find = ({ select, where }: FindOneArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const student = await prisma.students.findUnique({
-        where: {
-          id: id,
-        },
+        where: where,
+        select: select,
       });
       if (!student) {
         throw new NotFoundError("student not found");
@@ -61,13 +113,16 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = ({ take, skip }: FindManyArgs) => {
+const findMany = ({ take, skip, where, select, orderBy }: FindManyArgs) => {
   return new Promise<FindManyResponse>(async (resolve, reject) => {
     try {
       const [students, count] = await Promise.all([
         prisma.students.findMany({
-          take,
-          skip,
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
         }),
         prisma.students.count(),
       ]);

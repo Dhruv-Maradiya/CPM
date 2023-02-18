@@ -57,9 +57,27 @@ router.get("/findManyByStudent", auth, async (req, res, next) => {
       true
     );
 
-    const invitationForGroups = await InvitationForGroup.findManyByStudent(
-      query.studentId
-    );
+    const invitationForGroups = await InvitationForGroup.findMany({
+      where: {
+        memberId: query.studentId,
+      },
+      select: {
+        id: true,
+        group: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        groupLeader: {
+          select: {
+            id: true,
+            name: true,
+            enrollmentNo: true,
+          },
+        },
+      },
+    });
 
     res.locals["data"] = invitationForGroups;
     next();
@@ -76,9 +94,27 @@ router.get("/findManyByLeader", auth, async (req, res, next) => {
       true
     );
 
-    const invitationForGroups = await InvitationForGroup.findManyByLeader(
-      query.leaderId
-    );
+    const invitationForGroups = await InvitationForGroup.findMany({
+      where: {
+        groupLeaderId: query.leaderId,
+      },
+      select: {
+        id: true,
+        group: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        groupLeader: {
+          select: {
+            id: true,
+            name: true,
+            enrollmentNo: true,
+          },
+        },
+      },
+    });
 
     res.locals["data"] = invitationForGroups;
     next();

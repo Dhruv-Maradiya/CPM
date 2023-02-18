@@ -46,7 +46,7 @@ router.get("/findMany", auth, async (req, res, next) => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    const take = req.query["take"] ? Number(req.query["take"]) : 0;
+    const take = req.query["take"] ? Number(req.query["take"]) : 10;
 
     type Body = yup.InferType<typeof validation.findMany>;
     const validatedQuery = await validateSchema<Body>(
@@ -55,9 +55,43 @@ router.get("/findMany", auth, async (req, res, next) => {
       true
     );
     const id = validatedQuery["studentId"]; // validation goes here
-    const task = await Tasks.findMany(id, {
-      skip,
-      take,
+    const task = await Tasks.findMany({
+      where: {
+        assignedToParticipant: {
+          id: id,
+        },
+      },
+      select: {
+        id: true,
+        description: true,
+        name: true,
+        priority: true,
+        assignedToParticipant: {
+          select: {
+            id: true,
+            name: true,
+            enrollmentNo: true,
+          },
+        },
+        createdByLeader: {
+          select: {
+            id: true,
+            enrollmentNo: true,
+            name: true,
+          },
+        },
+        faculty: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        startTime: true,
+        endTime: true,
+        status: true,
+      },
+      skip: skip,
+      take: take,
     });
 
     res.locals["data"] = task;
@@ -71,7 +105,7 @@ router.get("/findManyByProject", auth, async (req, res, next) => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    const take = req.query["take"] ? Number(req.query["take"]) : 0;
+    const take = req.query["take"] ? Number(req.query["take"]) : 10;
 
     type Body = yup.InferType<typeof validation.findManyByProject>;
     const validatedQuery = await validateSchema<Body>(
@@ -80,7 +114,44 @@ router.get("/findManyByProject", auth, async (req, res, next) => {
       true
     );
     const id = validatedQuery["projectId"]; // validation goes here
-    const task = await Tasks.findManyByProject(id, { skip, take });
+    // const task = await Tasks.findManyByProject(id, { skip, take });
+
+    const task = await Tasks.findMany({
+      where: {
+        projectId: id,
+      },
+      select: {
+        id: true,
+        description: true,
+        name: true,
+        priority: true,
+        assignedToParticipant: {
+          select: {
+            id: true,
+            name: true,
+            enrollmentNo: true,
+          },
+        },
+        createdByLeader: {
+          select: {
+            id: true,
+            enrollmentNo: true,
+            name: true,
+          },
+        },
+        faculty: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        startTime: true,
+        endTime: true,
+        status: true,
+      },
+      skip: skip,
+      take: take,
+    });
 
     res.locals["data"] = task;
     next();
@@ -93,7 +164,7 @@ router.get("/findManyByProjectFaculty", auth, async (req, res, next) => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    const take = req.query["take"] ? Number(req.query["take"]) : 0;
+    const take = req.query["take"] ? Number(req.query["take"]) : 10;
 
     type Body = yup.InferType<typeof validation.findManyByProjectFaculty>;
     const validatedQuery = await validateSchema<Body>(
@@ -102,7 +173,45 @@ router.get("/findManyByProjectFaculty", auth, async (req, res, next) => {
       true
     );
     const id = validatedQuery["facultyId"]; // validation goes here
-    const task = await Tasks.findMany(id, { skip, take });
+    // const task = await Tasks.findMany(id, { skip, take });
+    const task = await Tasks.findMany({
+      where: {
+        faculty: {
+          id: id,
+        },
+      },
+      select: {
+        id: true,
+        description: true,
+        name: true,
+        priority: true,
+        assignedToParticipant: {
+          select: {
+            id: true,
+            name: true,
+            enrollmentNo: true,
+          },
+        },
+        createdByLeader: {
+          select: {
+            id: true,
+            enrollmentNo: true,
+            name: true,
+          },
+        },
+        faculty: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        startTime: true,
+        endTime: true,
+        status: true,
+      },
+      skip: skip,
+      take: take,
+    });
 
     res.locals["data"] = task;
     next();

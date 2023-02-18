@@ -3,6 +3,18 @@ import { prisma } from "../../../utils/index.js";
 import { Prisma, frontendTechnologies } from "@prisma/client";
 import { NotFoundError } from "../../../exceptions/index.js";
 
+type FindManyArgs = {
+  select?: Prisma.frontendTechnologiesSelect;
+  where?: Prisma.frontendTechnologiesWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.frontendTechnologiesOrderByWithRelationInput>;
+  take?: number;
+  skip?: number;
+};
+type FindOneArgs = {
+  select: Prisma.frontendTechnologiesSelect;
+  where: Prisma.frontendTechnologiesWhereUniqueInput;
+};
+
 const create = (data: Prisma.frontendTechnologiesUncheckedCreateInput) => {
   return new Promise<frontendTechnologies>(async (resolve, reject) => {
     try {
@@ -30,13 +42,12 @@ const update = (data: Prisma.frontendTechnologiesUpdateInput, id: number) => {
     }
   });
 };
-const find = (id: number) => {
-  return new Promise<frontendTechnologies>(async (resolve, reject) => {
+const find = ({ select, where }: FindOneArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const frontendTechnology = await prisma.frontendTechnologies.findUnique({
-        where: {
-          id: id,
-        },
+        where: where,
+        select: select,
       });
       if (!frontendTechnology) {
         throw new NotFoundError("frontendTechnology not found");
@@ -47,13 +58,20 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = () => {
-  return new Promise<frontendTechnologies[]>(async (resolve, reject) => {
+const findMany = ({ take, skip, select, where, orderBy }: FindManyArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const frontendTechnologies = await prisma.frontendTechnologies.findMany(
-        {}
-      );
-      return resolve(frontendTechnologies);
+      const [frontendTechnologies, count] = await Promise.all([
+        prisma.frontendTechnologies.findMany({
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
+        }),
+        prisma.frontendTechnologies.count(),
+      ]);
+      return resolve({ frontendTechnologies, count });
     } catch (error) {
       reject(error);
     }

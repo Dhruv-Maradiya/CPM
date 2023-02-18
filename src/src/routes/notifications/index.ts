@@ -39,9 +39,16 @@ router.get("/findManyByFaculty", auth, async (req, res, next) => {
       true
     );
 
-    const notifications = await Notifications.findManyByFaculty(
-      query.facultyId
-    );
+    const notifications = await Notifications.findManyByFaculty({
+      where: {
+        sentBy: query.facultyId,
+      },
+      select: {
+        id: true,
+        message: true,
+        createdAt: true,
+      },
+    });
 
     res.locals["data"] = notifications;
     next();
@@ -53,7 +60,23 @@ router.get("/findManyByStudent", auth, async (_req, res, next) => {
   try {
     const id = res.locals["user"].userDetails.id as number;
 
-    const notifications = await Notifications.findManyByStudent(id);
+    const notifications = await Notifications.findManyByStudent({
+      where: {
+        sentTo: id,
+        isRead: false,
+      },
+      select: {
+        id: true,
+        message: true,
+        createdAt: true,
+        faculty: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
 
     res.locals["data"] = notifications;
     next();

@@ -84,7 +84,18 @@ router.get("/find", async (req, res, next) => {
       true
     );
     const id = validatedQuery["id"]; // validation goes here
-    const backendTechnology = await BackendTechnologies.find(id);
+    const backendTechnology = await BackendTechnologies.find({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        name: true,
+        logo: true,
+        description: true,
+        url: true,
+      },
+    });
 
     res.locals["data"] = backendTechnology;
     next();
@@ -94,7 +105,15 @@ router.get("/find", async (req, res, next) => {
 });
 router.get("/findMany", async (_req, res, next) => {
   try {
-    const backendTechnologies = await BackendTechnologies.findMany();
+    const backendTechnologies = await BackendTechnologies.findMany({
+      select: {
+        id: true,
+        name: true,
+        logo: true,
+        description: true,
+        url: true,
+      },
+    });
 
     res.locals["data"] = backendTechnologies;
     next();

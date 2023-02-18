@@ -22,14 +22,20 @@ type ProjectByStudentResponse = {
     }[];
   };
 };
-
-type FindManyArgs = {
-  take: number;
-  skip: number;
-};
 type FindManyResponse = {
   projects: projects[];
   count: number;
+};
+type FindManyArgs = {
+  select?: Prisma.projectsSelect;
+  where?: Prisma.projectsWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.projectsOrderByWithRelationInput>;
+  take?: number;
+  skip?: number;
+};
+type FindOneArgs = {
+  select: Prisma.projectsSelect;
+  where: Prisma.projectsWhereUniqueInput;
 };
 
 const create = (data: Prisma.projectsUncheckedCreateInput) => {
@@ -87,34 +93,33 @@ const upload = (id: number, files: Express.Multer.File[]) => {
   });
 };
 
-const find = (id: number) => {
-  return new Promise<projects>(async (resolve, reject) => {
+const find = ({ select, where }: FindOneArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const project = await prisma.projects.findUnique({
-        where: {
-          id: id,
-        },
-        select: {
-          id: true,
-          name: true,
-          categoryId: true,
-          academicId: true,
-          frontendTechnologyId: true,
-          backendTechnologyId: true,
-          databaseTechnologyId: true,
-          groupId: true,
-          description: true,
-          updatedAt: true,
-          createdAt: true,
-          isVerified: true,
-          verifiedByFacultyId: true,
-          academic: true,
-          frontendTechnology: true,
-          backendTechnology: true,
-          databaseTechnology: true,
-          media: true,
-          category: true,
-        },
+        where: where,
+        // select: {
+        //   id: true,
+        //   name: true,
+        //   categoryId: true,
+        //   academicId: true,
+        //   frontendTechnologyId: true,
+        //   backendTechnologyId: true,
+        //   databaseTechnologyId: true,
+        //   groupId: true,
+        //   description: true,
+        //   updatedAt: true,
+        //   createdAt: true,
+        //   isVerified: true,
+        //   verifiedByFacultyId: true,
+        //   academic: true,
+        //   frontendTechnology: true,
+        //   backendTechnology: true,
+        //   databaseTechnology: true,
+        //   media: true,
+        //   category: true,
+        // },
+        select: select,
       });
       if (!project) {
         throw new NotFoundError("project not found");
@@ -125,34 +130,37 @@ const find = (id: number) => {
     }
   });
 };
-const findMany = ({ take, skip }: FindManyArgs) => {
+const findMany = ({ take, skip, where, select, orderBy }: FindManyArgs) => {
   return new Promise<FindManyResponse>(async (resolve, reject) => {
     try {
       const [projects, count] = await Promise.all([
         prisma.projects.findMany({
-          select: {
-            id: true,
-            name: true,
-            categoryId: true,
-            academicId: true,
-            frontendTechnologyId: true,
-            backendTechnologyId: true,
-            databaseTechnologyId: true,
-            groupId: true,
-            description: true,
-            updatedAt: true,
-            createdAt: true,
-            isVerified: true,
-            verifiedByFacultyId: true,
-            academic: true,
-            frontendTechnology: true,
-            backendTechnology: true,
-            databaseTechnology: true,
-            media: true,
-            category: true,
-          },
-          take: take,
-          skip: skip,
+          // select: {
+          //   id: true,
+          //   name: true,
+          //   categoryId: true,
+          //   academicId: true,
+          //   frontendTechnologyId: true,
+          //   backendTechnologyId: true,
+          //   databaseTechnologyId: true,
+          //   groupId: true,
+          //   description: true,
+          //   updatedAt: true,
+          //   createdAt: true,
+          //   isVerified: true,
+          //   verifiedByFacultyId: true,
+          //   academic: true,
+          //   frontendTechnology: true,
+          //   backendTechnology: true,
+          //   databaseTechnology: true,
+          //   media: true,
+          //   category: true,
+          // },
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
         }),
         prisma.projects.count({}),
       ]);

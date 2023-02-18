@@ -60,16 +60,19 @@ const find = ({ select, where }: FindOneArgs) => {
   });
 };
 const findMany = ({ select, where, orderBy, take, skip }: FindManyArgs) => {
-  return new Promise<backendTechnologies[]>(async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const backendTechnologies = await prisma.backendTechnologies.findMany({
-        ...(where ? { where: where } : {}),
-        ...(select ? { select: select } : {}),
-        ...(orderBy ? { orderBy: orderBy } : {}),
-        ...(take != null ? { take: take } : {}),
-        ...(skip != null ? { skip: skip } : {}),
-      });
-      return resolve(backendTechnologies);
+      const [backendTechnologies, count] = await Promise.all([
+        prisma.backendTechnologies.findMany({
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
+        }),
+        prisma.backendTechnologies.count(),
+      ]);
+      return resolve({ backendTechnologies, count });
     } catch (error) {
       reject(error);
     }

@@ -4,8 +4,15 @@ import { Prisma, groups, PrismaClient } from "@prisma/client";
 import { MethodNotAllowed, NotFoundError } from "../../../exceptions/index.js";
 
 type FindManyArgs = {
+  select?: Prisma.groupsSelect;
+  where?: Prisma.groupsWhereInput;
+  orderBy?: Prisma.Enumerable<Prisma.groupsOrderByWithRelationInput>;
   take?: number;
   skip?: number;
+};
+type FindOneArgs = {
+  select: Prisma.groupsSelect;
+  where: Prisma.groupsWhereUniqueInput;
 };
 
 const create = (
@@ -50,30 +57,29 @@ const update = (
     }
   });
 };
-const find = (id: number) => {
-  return new Promise<groups>(async (resolve, reject) => {
+const find = ({ select, where }: FindOneArgs) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const group = await prisma.groups.findUnique({
-        where: {
-          id: id,
-        },
+        where: where,
+        select: select,
       });
-      if (!group) {
-        throw new NotFoundError("group not found");
-      }
       return resolve(group);
     } catch (error) {
       reject(error);
     }
   });
 };
-const findMany = ({ skip, take }: FindManyArgs) => {
+const findMany = ({ take, skip, select, where, orderBy }: FindManyArgs) => {
   return new Promise(async (resolve, reject) => {
     try {
       const [groups, count] = await Promise.all([
         prisma.groups.findMany({
-          take: take ?? 10,
-          skip: skip ?? 0,
+          ...(where ? { where: where } : {}),
+          ...(select ? { select: select } : {}),
+          ...(orderBy ? { orderBy: orderBy } : {}),
+          ...(take != null ? { take: take } : {}),
+          ...(skip != null ? { skip: skip } : {}),
         }),
         prisma.groups.count(),
       ]);

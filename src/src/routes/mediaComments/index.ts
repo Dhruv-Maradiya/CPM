@@ -36,7 +36,23 @@ router.get("/findMany", async (req, res, next) => {
       true
     );
 
-    const mediaComments = await MediaComments.findMany(query.mediaId);
+    const mediaComments = await MediaComments.findMany({
+      where: {
+        id: query.mediaId,
+      },
+      select: {
+        id: true,
+        comment: true,
+        faculty: {
+          select: {
+            id: true,
+            name: true,
+            profilePicture: true,
+          },
+        },
+        createdAt: true,
+      },
+    });
 
     res.locals["data"] = mediaComments;
     next();

@@ -5,8 +5,27 @@ import { validateSchema, yup } from "../../../utils/index.js";
 import Faculty from "../../controllers/faculty/index.js";
 import validation from "./validation/index.js";
 import { auth } from "../../../middleware/index.js";
+import path from "path";
+import url from "url";
+import multer from "multer";
 
 const router = Router();
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const storage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    cb(null, path.join(__dirname, "../../../../", "public/images"));
+  },
+  filename: function (_req, file, cb) {
+    const name = file.originalname.split(".");
+
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + "." + name[name.length - 1]);
+  },
+});
+const upload = multer({ storage: storage });
 
 router.post("/", auth, async (req, res, next) => {
   try {
@@ -25,13 +44,17 @@ router.post("/", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", auth, async (req, res, next) => {
+router.put("/", auth, upload.single("file"), async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
-    await validateSchema<Body>(validation.update, req.body, true);
+    req.body = await validateSchema<Body>(validation.update, req.body, true);
 
     const id = req.body.id;
     delete req.body.id;
+
+    if (req.file != null) {
+      req.body.profilePicture = req.file.filename;
+    }
 
     const body: Prisma.facultyUpdateInput = req.body;
     const faculty = await Faculty.update(body, id);
@@ -52,7 +75,25 @@ router.get("/find", auth, async (req, res, next) => {
     );
 
     const id = validatedQuery["id"]; // validation goes here
-    const faculty = await Faculty.find(id);
+    const faculty = await Faculty.find({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        name: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        email: true,
+        employeeId: true,
+        number: true,
+        profilePicture: true,
+      },
+    });
 
     res.locals["data"] = faculty;
     next();
@@ -69,6 +110,20 @@ router.get("/findMany", auth, async (_req, res, next) => {
     const faculties = await Faculty.findMany({
       take: take,
       skip: skip,
+      select: {
+        id: true,
+        name: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        email: true,
+        employeeId: true,
+        number: true,
+        profilePicture: true,
+      },
     });
 
     res.locals["data"] = faculties;
