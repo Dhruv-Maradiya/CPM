@@ -108,7 +108,7 @@ router.get("/findMany", async (req, res, next) => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    const take = req.query["take"] ? Number(req.query["take"]) : 0;
+    const take = req.query["take"] ? Number(req.query["take"]) : 10;
     const students = await Students.findMany({
       skip,
       take,
