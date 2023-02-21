@@ -8,7 +8,7 @@ import { auth } from "../../../middleware/index.js";
 import multer from "multer";
 import path from "path";
 import url from "url";
-import { NotFoundError } from "../../../exceptions/index.js";
+import { BadRequestError, NotFoundError } from "../../../exceptions/index.js";
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -243,6 +243,118 @@ router.get("/findMany", async (req, res, next) => {
                     enrollmentNo: true,
                   },
                 },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    res.locals["data"] = projects;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+router.get("/findManyByStudent", async (req, res, next) => {
+  try {
+    const skip =
+      req.query["skip"] !== null && req.query["skip"] !== undefined
+        ? Number(req.query["skip"])
+        : 0;
+    const take =
+      req.query["take"] !== null && req.query["take"] !== undefined
+        ? Number(req.query["take"])
+        : 10;
+    const studentId = req.query["studentId"];
+
+    if (studentId === undefined || studentId === null) {
+      throw new BadRequestError("StudentId is required");
+    }
+
+    const projects = await Projects.findMany({
+      skip,
+      take,
+      select: {
+        id: true,
+        name: true,
+        academic: {
+          select: {
+            id: true,
+            sem: true,
+            year: true,
+            maximumGroupMember: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        frontendTechnology: {
+          select: {
+            id: true,
+            name: true,
+            logo: true,
+            description: true,
+            url: true,
+          },
+        },
+        databaseTechnology: {
+          select: {
+            id: true,
+            name: true,
+            logo: true,
+            description: true,
+            url: true,
+          },
+        },
+        backendTechnology: {
+          select: {
+            id: true,
+            name: true,
+            logo: true,
+            description: true,
+            url: true,
+          },
+        },
+        isVerified: true,
+        description: true,
+        media: {
+          select: {
+            id: true,
+            format: true,
+            identifier: true,
+            name: true,
+          },
+        },
+        group: {
+          select: {
+            id: true,
+            name: true,
+            groupParticipants: {
+              select: {
+                id: true,
+                role: true,
+                student: {
+                  select: {
+                    id: true,
+                    name: true,
+                    enrollmentNo: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      where: {
+        group: {
+          groupParticipants: {
+            some: {
+              studentId: {
+                equals: +studentId,
               },
             },
           },
