@@ -3,6 +3,7 @@ import { Router } from "express";
 import { prisma } from "../../../utils/index.js";
 import { auth } from "../../../middleware/index.js";
 import Projects from "../../controllers/projects/index.js";
+import Categories from "../../controllers/categories/index.js";
 
 const router = Router();
 
@@ -35,82 +36,84 @@ router.get(
           ? (isUnreadNotifications = true)
           : (isUnreadNotifications = false);
       }
-      const projects = await Projects.findMany({
-        take,
-        skip,
-        select: {
-          id: true,
-          name: true,
-          academic: {
-            select: {
-              id: true,
-              sem: true,
-              year: true,
-              maximumGroupMember: true,
+      const [projects, categories] = await Promise.all([
+        Projects.findMany({
+          take,
+          skip,
+          select: {
+            id: true,
+            name: true,
+            academic: {
+              select: {
+                id: true,
+                sem: true,
+                year: true,
+                maximumGroupMember: true,
+              },
             },
-          },
-          category: {
-            select: {
-              id: true,
-              name: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
-          },
-          frontendTechnology: {
-            select: {
-              id: true,
-              name: true,
-              logo: true,
-              description: true,
-              url: true,
+            frontendTechnology: {
+              select: {
+                id: true,
+                name: true,
+                logo: true,
+                description: true,
+                url: true,
+              },
             },
-          },
-          databaseTechnology: {
-            select: {
-              id: true,
-              name: true,
-              logo: true,
-              description: true,
-              url: true,
+            databaseTechnology: {
+              select: {
+                id: true,
+                name: true,
+                logo: true,
+                description: true,
+                url: true,
+              },
             },
-          },
-          backendTechnology: {
-            select: {
-              id: true,
-              name: true,
-              logo: true,
-              description: true,
-              url: true,
+            backendTechnology: {
+              select: {
+                id: true,
+                name: true,
+                logo: true,
+                description: true,
+                url: true,
+              },
             },
-          },
-          isVerified: true,
-          description: true,
-          media: {
-            select: {
-              id: true,
-              format: true,
-              identifier: true,
-              name: true,
+            isVerified: true,
+            description: true,
+            media: {
+              select: {
+                id: true,
+                format: true,
+                identifier: true,
+                name: true,
+              },
             },
-          },
-          group: {
-            select: {
-              id: true,
-              name: true,
-              groupParticipants: {
-                select: {
-                  id: true,
-                  role: true,
-                  student: {
-                    select: {
-                      id: true,
-                      name: true,
-                      enrollmentNo: true,
-                      profilePicture: true,
-                      branch: {
-                        select: {
-                          name: true,
-                          displayName: true,
-                          id: true,
+            group: {
+              select: {
+                id: true,
+                name: true,
+                groupParticipants: {
+                  select: {
+                    id: true,
+                    role: true,
+                    student: {
+                      select: {
+                        id: true,
+                        name: true,
+                        enrollmentNo: true,
+                        profilePicture: true,
+                        branch: {
+                          select: {
+                            name: true,
+                            displayName: true,
+                            id: true,
+                          },
                         },
                       },
                     },
@@ -118,24 +121,31 @@ router.get(
                 },
               },
             },
-          },
-          projectGuideMapping: {
-            select: {
-              id: true,
-              faculty: {
-                select: {
-                  name: true,
-                  employeeId: true,
-                  profilePicture: true,
+            projectGuideMapping: {
+              select: {
+                id: true,
+                faculty: {
+                  select: {
+                    name: true,
+                    employeeId: true,
+                    profilePicture: true,
+                  },
                 },
               },
             },
           },
-        },
-      });
+        }),
+        Categories.findMany({
+          select: {
+            id: true,
+            name: true,
+          },
+        }),
+      ]);
 
       res.locals["data"] = {
         ...projects,
+        categories,
         isUnreadNotifications,
       };
       next();
