@@ -273,8 +273,8 @@ router.get("/findManyByStudent", async (req, res, next) => {
     }
 
     const projects = await Projects.findMany({
-      skip,
       take,
+      skip,
       select: {
         id: true,
         name: true,
@@ -342,19 +342,28 @@ router.get("/findManyByStudent", async (req, res, next) => {
                     id: true,
                     name: true,
                     enrollmentNo: true,
+                    profilePicture: true,
+                    branch: {
+                      select: {
+                        name: true,
+                        displayName: true,
+                        id: true,
+                      },
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
-      where: {
-        group: {
-          groupParticipants: {
-            some: {
-              studentId: {
-                equals: +studentId,
+        projectGuideMapping: {
+          select: {
+            id: true,
+            faculty: {
+              select: {
+                name: true,
+                employeeId: true,
+                profilePicture: true,
               },
             },
           },
