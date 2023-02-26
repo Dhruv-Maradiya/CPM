@@ -23,10 +23,13 @@ const create = (data: Prisma.facultyUncheckedCreateInput) => {
   return new Promise<{
     number: string;
     employeeId: string;
-    profilePicture: string | null;
+    name: string;
     email: string;
-    createdAt: Date;
-    updatedAt: Date;
+    profilePicture: string | null;
+    createdBy: {
+      name: string;
+      id: number;
+    } | null;
     facultyRoles: {
       name: string;
       id: number;
@@ -39,6 +42,13 @@ const create = (data: Prisma.facultyUncheckedCreateInput) => {
         data: data,
         select: {
           id: true,
+          name: true,
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           facultyRoles: {
             select: {
               id: true,
@@ -47,10 +57,8 @@ const create = (data: Prisma.facultyUncheckedCreateInput) => {
           },
           email: true,
           employeeId: true,
-          profilePicture: true,
           number: true,
-          createdAt: true,
-          updatedAt: true,
+          profilePicture: true,
         },
       });
       return resolve(faculty);
@@ -63,10 +71,13 @@ const update = (data: Prisma.facultyUpdateInput, id: number) => {
   return new Promise<{
     number: string;
     employeeId: string;
+    name: string;
     profilePicture: string | null;
     email: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdBy: {
+      name: string;
+      id: number;
+    } | null;
     facultyRoles: {
       name: string;
       id: number;
@@ -81,6 +92,13 @@ const update = (data: Prisma.facultyUpdateInput, id: number) => {
         },
         select: {
           id: true,
+          name: true,
+          createdBy: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           facultyRoles: {
             select: {
               id: true,
@@ -89,10 +107,8 @@ const update = (data: Prisma.facultyUpdateInput, id: number) => {
           },
           email: true,
           employeeId: true,
-          profilePicture: true,
           number: true,
-          createdAt: true,
-          updatedAt: true,
+          profilePicture: true,
         },
       });
       return resolve(faculty);

@@ -88,6 +88,12 @@ router.get("/find", auth, async (req, res, next) => {
             name: true,
           },
         },
+        facultyRoles: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         email: true,
         employeeId: true,
         number: true,
