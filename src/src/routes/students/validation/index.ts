@@ -29,6 +29,7 @@ const update = yup
   .shape({
     id: yup.number().required(),
     name: yup.string().max(255).optional(),
+    email: yup.string().email().optional(),
     semester: yup.number().optional(),
     password: yup
       .string()
