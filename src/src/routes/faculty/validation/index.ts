@@ -11,7 +11,7 @@ const create = yup
       .required()
       .min(8, "password must be at least 8 characters")
       .matches(
-        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*?&])[A-Za-z\d@$!%*?_&]{8,}$/,
         "must contain at least one uppercase letter, one lowercase letter, one digit, and one special"
       ),
     email: yup.string().email().required(),
@@ -36,6 +36,14 @@ const update = yup
       .string()
       .matches(/a/, "number must be a valid number")
       .optional(),
+    password: yup
+      .string()
+      .optional()
+      .min(8, "password must be at least 8 characters")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*?&])[A-Za-z\d@$!%*?_&]{8,}$/,
+        "must contain at least one uppercase letter, one lowercase letter, one digit, and one special"
+      ),
   })
   .noUnknown(true)
   .strict(true);
@@ -49,7 +57,7 @@ const login = yup.object().shape({
     .required()
     .min(8, "password must be at least 8 characters")
     .matches(
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*?&])[A-Za-z\d@$!%*?_&]{8,}$/,
       "must contain at least one uppercase letter, one lowercase letter, one digit, and one special"
     ),
 });

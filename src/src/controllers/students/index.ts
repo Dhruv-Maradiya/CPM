@@ -69,6 +69,10 @@ const create = (data: Prisma.studentsUncheckedCreateInput) => {
 const update = (data: Prisma.studentsUpdateInput, id: number) => {
   return new Promise(async (resolve, reject) => {
     try {
+      if (data.password !== undefined && data.password !== null) {
+        data.password = await hash(data.password as string);
+      }
+
       const student = await prisma.students.update({
         data: data,
         where: {

@@ -10,7 +10,7 @@ const create = yup
       .min(8, "password must be at least 8 characters")
       .matches(
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-        "must contain at least one uppercase letter, one lowercase letter, one digit, and one special"
+        "password must contain at least one uppercase letter, one lowercase letter, one digit, and one special"
       ),
     semester: yup.number().required(),
     branchId: yup.number().required(),
@@ -30,6 +30,14 @@ const update = yup
     id: yup.number().required(),
     name: yup.string().max(255).optional(),
     semester: yup.number().optional(),
+    password: yup
+      .string()
+      .min(8, "password must be at least 8 characters")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*?&])[A-Za-z\d@$!%*?_&]{8,}$/,
+        "password must contain at least one uppercase letter, one lowercase letter, one digit, and one special"
+      )
+      .optional(),
   })
   .noUnknown(true)
   .strict(true);
@@ -43,7 +51,7 @@ const login = yup.object().shape({
     .required()
     .min(8, "password must be at least 8 characters")
     .matches(
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*?&])[A-Za-z\d@$!%*?_&]{8,}$/,
       "must contain at least one uppercase letter, one lowercase letter, one digit, and one special"
     ),
 });
