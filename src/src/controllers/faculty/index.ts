@@ -85,6 +85,11 @@ const update = (data: Prisma.facultyUpdateInput, id: number) => {
     id: number;
   }>(async (resolve, reject) => {
     try {
+      if (data.password !== undefined && data.password !== null) {
+        data.password = await hash(data.password as string);
+      } else {
+        delete data.password;
+      }
       const faculty = await prisma.faculty.update({
         data: data,
         where: {

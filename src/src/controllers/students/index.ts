@@ -71,6 +71,8 @@ const update = (data: Prisma.studentsUpdateInput, id: number) => {
     try {
       if (data.password !== undefined && data.password !== null) {
         data.password = await hash(data.password as string);
+      } else {
+        delete data.password;
       }
 
       const student = await prisma.students.update({
