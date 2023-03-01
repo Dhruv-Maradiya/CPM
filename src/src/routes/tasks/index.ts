@@ -41,7 +41,7 @@ router.put("/", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findMany", auth, async (req, res, next) => {
+router.get("/findManyByMember", auth, async (req, res, next) => {
   try {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
@@ -54,12 +54,14 @@ router.get("/findMany", auth, async (req, res, next) => {
       req.query,
       true
     );
-    const id = validatedQuery["studentId"]; // validation goes here
+    const studentId = validatedQuery["studentId"]; // validation goes here
+    const projectId = validatedQuery["projectId"]; // validation goes here
     const task = await Tasks.findMany({
       where: {
         assignedToParticipant: {
-          id: id,
+          id: studentId,
         },
+        projectId: projectId,
       },
       select: {
         id: true,

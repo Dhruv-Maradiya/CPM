@@ -23,6 +23,13 @@ const create = yup
             return isValidDate(newDate);
           }
         })
+        .transform((val) => {
+          if (val === undefined || val === null) {
+            return null;
+          } else {
+            return new Date(val);
+          }
+        })
         .optional(),
       endTime: yup
         .mixed()
@@ -32,6 +39,13 @@ const create = yup
           } else {
             const newDate = new Date(val);
             return isValidDate(newDate);
+          }
+        })
+        .transform((val) => {
+          if (val === undefined || val === null) {
+            return null;
+          } else {
+            return new Date(val);
           }
         })
         .optional(),
@@ -81,7 +95,12 @@ const update = yup
   .noUnknown(true)
   .strict(true);
 
-const findMany = yup.object().shape({ studentId: yup.number().required() });
+const findMany = yup
+  .object()
+  .shape({
+    studentId: yup.number().required(),
+    projectId: yup.number().required(),
+  });
 const findManyByProject = yup
   .object()
   .shape({ projectId: yup.number().required() });
