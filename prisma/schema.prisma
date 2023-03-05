@@ -323,7 +323,7 @@ enum invitationForGroup_status {
 }
 
 enum tasks_status {
-  COMPLETEED
+  COMPLETED
   DELAYED
   PENDING
   IN_PROGRESS

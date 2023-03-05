@@ -3,7 +3,7 @@ import { yup } from "../../../../utils/index.js";
 const create = yup
   .object()
   .shape({
-    memberId: yup.number().required(),
+    members: yup.array().of(yup.number().required()).required().min(1),
     groupLeaderId: yup.number().required(),
     groupId: yup.number().required(),
   })

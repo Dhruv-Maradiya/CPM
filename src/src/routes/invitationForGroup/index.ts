@@ -17,14 +17,25 @@ router.post("/", auth, async (req, res, next) => {
       false
     );
 
-    const body: Prisma.invitationForGroupUncheckedCreateInput = {
-      ...validatedBody,
-      status: "PENDING",
-    };
+    const invitations = await Promise.all(
+      validatedBody.members.map(async (member) => {
+        return InvitationForGroup.create({
+          groupId: validatedBody.groupId,
+          groupLeaderId: validatedBody.groupLeaderId,
+          memberId: member,
+          status: "PENDING",
+        });
+      })
+    );
 
-    const invitationForGroup = await InvitationForGroup.create(body);
+    // const body: Prisma.invitationForGroupUncheckedCreateInput = {
+    //   ...validatedBody,
+    //   status: "PENDING",
+    // };
 
-    res.locals["data"] = invitationForGroup;
+    // const invitationForGroup = await InvitationForGroup.create(body);
+
+    res.locals["data"] = invitations;
     next();
   } catch (error) {
     next(error);
@@ -48,7 +59,7 @@ router.put("/updateStatus", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyByStudent", auth, async (req, res, next) => {
+router.get("/findManyByStudentReceived", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.findManyByStudent>;
     const query = await validateSchema<Body>(
@@ -76,6 +87,7 @@ router.get("/findManyByStudent", auth, async (req, res, next) => {
             enrollmentNo: true,
           },
         },
+        status: true,
       },
     });
 
@@ -113,6 +125,7 @@ router.get("/findManyByLeader", auth, async (req, res, next) => {
             enrollmentNo: true,
           },
         },
+        status: true,
       },
     });
 
