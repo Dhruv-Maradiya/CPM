@@ -13,6 +13,10 @@ const create = yup
       description: yup.string().required(),
       priority: yup.number().required().min(1).max(10),
       assignedToParticipantId: yup.number().required(),
+      status: yup
+        .string()
+        .required()
+        .oneOf(["PENDING", "IN_PROGRESS", "COMPLETED", "DELAYED"]),
       startTime: yup
         .mixed()
         .test("testDate", "startTime must be a valid date", (val) => {
@@ -95,12 +99,10 @@ const update = yup
   .noUnknown(true)
   .strict(true);
 
-const findMany = yup
-  .object()
-  .shape({
-    studentId: yup.number().required(),
-    projectId: yup.number().required(),
-  });
+const findMany = yup.object().shape({
+  studentId: yup.number().required(),
+  projectId: yup.number().required(),
+});
 const findManyByProject = yup
   .object()
   .shape({ projectId: yup.number().required() });

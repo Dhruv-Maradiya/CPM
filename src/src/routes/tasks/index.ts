@@ -12,10 +12,7 @@ router.post("/", auth, async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     req.body = await validateSchema<Body>(validation.create, req.body, true);
-    const body: Prisma.tasksUncheckedCreateInput = {
-      ...req.body,
-      status: "PENDING",
-    };
+    const body: Prisma.tasksUncheckedCreateInput = req.body;
     const task = await Tasks.create(body);
 
     res.locals["data"] = task;
