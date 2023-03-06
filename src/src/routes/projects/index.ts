@@ -52,16 +52,36 @@ router.post("/", upload.array("files"), auth, async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", auth, async (req, res, next) => {
+router.put("/", upload.array("files"), auth, async (req, res, next) => {
   try {
+    const files = req.files as Express.Multer.File[];
+
     type Body = yup.InferType<typeof validation.update>;
-    await validateSchema<Body>(validation.update, req.body, true);
+    req.body = await validateSchema<Body>(validation.update, req.body, true);
 
     const id = req.body.id;
     delete req.body.id;
 
+    const removeImages: number[] = [];
+
+    if (req.body.removeImages?.length > 0) {
+      for (const removeImage of req.body.removeImages) {
+        removeImages.push(removeImage);
+      }
+      if (req.body.media == undefined) {
+        req.body.media = {};
+      }
+      req.body.media.deleteMany = {
+        id: {
+          in: removeImages,
+        },
+      };
+      delete req.body.removeImages;
+    }
     const body: Prisma.projectsUpdateInput = req.body;
+
     const project = await Projects.update(body, id);
+    await Projects.upload(project.id, files);
 
     res.locals["data"] = project;
     next();

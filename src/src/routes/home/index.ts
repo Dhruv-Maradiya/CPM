@@ -4,6 +4,7 @@ import { prisma } from "../../../utils/index.js";
 import { auth } from "../../../middleware/index.js";
 import Projects from "../../controllers/projects/index.js";
 import Categories from "../../controllers/categories/index.js";
+import { Prisma } from "@prisma/client";
 
 const router = Router();
 
@@ -21,6 +22,13 @@ router.get(
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       const take = req.query["take"] ? Number(req.query["take"]) : 10;
 
+      const categoryId =
+        req.query["categoryId"] != null
+          ? Number(req.query["categoryId"])
+          : null;
+
+      const search = req.query["search"] != null ? req.query["search"] : null;
+
       if (res.locals["user"] !== null && res.locals["user"] !== undefined) {
         const userId = res.locals["user"].userDetails.id;
         const unreadNotifications = await prisma.notification_history.count({
@@ -36,6 +44,19 @@ router.get(
           ? (isUnreadNotifications = true)
           : (isUnreadNotifications = false);
       }
+
+      const whereArgs: Prisma.projectsWhereInput = {};
+
+      if (categoryId != null) {
+        whereArgs.categoryId = categoryId;
+      }
+
+      if (search != null) {
+        whereArgs.name = {
+          contains: search.toString(),
+        };
+      }
+
       const [projects, categories] = await Promise.all([
         Projects.findMany({
           take,
@@ -134,6 +155,7 @@ router.get(
               },
             },
           },
+          where: whereArgs,
         }),
         Categories.findMany({
           select: {

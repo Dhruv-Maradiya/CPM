@@ -27,6 +27,7 @@ const update = yup
     categoryId: yup.number().optional(),
     groupId: yup.number().optional(),
     description: yup.string().optional(),
+    removeImages: yup.array().of(yup.number()).optional(),
   })
   .noUnknown(true)
   .strict(true);
