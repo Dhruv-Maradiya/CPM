@@ -109,6 +109,7 @@ router.get("/findMany", async (_req, res, next) => {
         id: true,
         name: true,
         logo: true,
+        description: true,
         url: true,
       },
     });
