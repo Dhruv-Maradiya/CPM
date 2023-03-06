@@ -169,8 +169,28 @@ router.get("/find", async (req, res, next) => {
                     id: true,
                     name: true,
                     enrollmentNo: true,
+                    profilePicture: true,
+                    branch: {
+                      select: {
+                        name: true,
+                        displayName: true,
+                        id: true,
+                      },
+                    },
                   },
                 },
+              },
+            },
+          },
+        },
+        projectGuideMapping: {
+          select: {
+            id: true,
+            faculty: {
+              select: {
+                name: true,
+                employeeId: true,
+                profilePicture: true,
               },
             },
           },
