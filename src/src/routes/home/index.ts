@@ -47,15 +47,17 @@ router.get(
 
       const whereArgs: Prisma.projectsWhereInput = {};
 
-      if (categoryId != null) {
+      if (categoryId !== null && categoryId !== undefined && categoryId !== 0) {
         whereArgs.categoryId = categoryId;
       }
 
-      if (search != null) {
+      if (search != null && search !== undefined && search !== "") {
         whereArgs.name = {
           contains: search.toString(),
         };
       }
+
+      console.log(whereArgs);
 
       const [projects, categories] = await Promise.all([
         Projects.findMany({
