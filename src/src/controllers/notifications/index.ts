@@ -61,7 +61,9 @@ const findManyByFaculty = ({
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.notifications.count(),
+        prisma.notifications.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
       return resolve({ notifications, count });
     } catch (error) {
@@ -101,7 +103,9 @@ const findManyByStudent = ({
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.notification_history.count(),
+        prisma.notification_history.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
       return resolve({ notifications, count });
     } catch (error) {

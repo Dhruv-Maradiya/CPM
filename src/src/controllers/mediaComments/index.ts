@@ -33,7 +33,9 @@ const findMany = ({ select, where, skip, take, orderBy }: FindManyArgs) => {
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.mediaComments.count(),
+        prisma.mediaComments.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
       return resolve({ mediaComments, count });
     } catch (error) {

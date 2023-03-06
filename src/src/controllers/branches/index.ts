@@ -69,7 +69,9 @@ const findMany = ({ select, where, skip, take, orderBy }: FindManyArgs) => {
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.branches.count(),
+        prisma.branches.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
       return resolve({ branches, count });
     } catch (error) {

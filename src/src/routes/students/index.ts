@@ -136,6 +136,49 @@ router.get("/findMany", async (req, res, next) => {
     next(error);
   }
 });
+router.get("/findManyForInvite", auth, async (req, res, next) => {
+  try {
+    type Body = yup.InferType<typeof validation.findManyInvite>;
+    const query = await validateSchema<Body>(
+      validation.findManyInvite,
+      req.query,
+      true
+    );
+
+    const userDetails = res.locals["user"];
+
+    const students = await Students.findMany({
+      skip: query.skip,
+      take: query.take,
+      select: {
+        id: true,
+        enrollmentNo: true,
+        profilePicture: true,
+        name: true,
+        email: true,
+        branch: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+          },
+        },
+        number: true,
+        semester: true,
+      },
+      where: {
+        id: {
+          not: userDetails.userDetails.id,
+        },
+      },
+    });
+
+    res.locals["data"] = students;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 router.post("/login", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.login>;

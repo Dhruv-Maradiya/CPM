@@ -135,34 +135,15 @@ const findMany = ({ take, skip, where, select, orderBy }: FindManyArgs) => {
     try {
       const [projects, count] = await Promise.all([
         prisma.projects.findMany({
-          // select: {
-          //   id: true,
-          //   name: true,
-          //   categoryId: true,
-          //   academicId: true,
-          //   frontendTechnologyId: true,
-          //   backendTechnologyId: true,
-          //   databaseTechnologyId: true,
-          //   groupId: true,
-          //   description: true,
-          //   updatedAt: true,
-          //   createdAt: true,
-          //   isVerified: true,
-          //   verifiedByFacultyId: true,
-          //   academic: true,
-          //   frontendTechnology: true,
-          //   backendTechnology: true,
-          //   databaseTechnology: true,
-          //   media: true,
-          //   category: true,
-          // },
           ...(where ? { where: where } : {}),
           ...(select ? { select: select } : {}),
           ...(orderBy ? { orderBy: orderBy } : {}),
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.projects.count({}),
+        prisma.projects.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
 
       return resolve({ projects, count });
