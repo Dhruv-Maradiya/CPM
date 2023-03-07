@@ -81,6 +81,7 @@ router.get("/find", async (req, res, next) => {
                 id: true,
                 enrollmentNo: true,
                 name: true,
+                profilePicture: true,
               },
             },
           },
