@@ -39,10 +39,123 @@ type FindOneArgs = {
 };
 
 const create = (data: Prisma.projectsUncheckedCreateInput) => {
-  return new Promise<projects>(async (resolve, reject) => {
+  return new Promise<{
+    name: string;
+    description: string | null;
+    id: number;
+    isVerified: boolean;
+    media: {
+      name: string;
+      id: number;
+      format: string;
+      identifier: string;
+    }[];
+    projectGuideMapping: {
+      faculty: {
+        name: string;
+        profilePicture: string | null;
+        employeeId: string;
+      };
+      id: number;
+    }[];
+  }>(async (resolve, reject) => {
     try {
       const project = await prisma.projects.create({
         data: data,
+        select: {
+          id: true,
+          name: true,
+          academic: {
+            select: {
+              id: true,
+              sem: true,
+              year: true,
+              maximumGroupMember: true,
+            },
+          },
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          frontendTechnology: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              description: true,
+              url: true,
+            },
+          },
+          databaseTechnology: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              description: true,
+              url: true,
+            },
+          },
+          backendTechnology: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              description: true,
+              url: true,
+            },
+          },
+          isVerified: true,
+          description: true,
+          media: {
+            select: {
+              id: true,
+              format: true,
+              identifier: true,
+              name: true,
+            },
+          },
+          group: {
+            select: {
+              id: true,
+              name: true,
+              groupParticipants: {
+                select: {
+                  id: true,
+                  role: true,
+                  student: {
+                    select: {
+                      id: true,
+                      name: true,
+                      enrollmentNo: true,
+                      profilePicture: true,
+                      branch: {
+                        select: {
+                          name: true,
+                          displayName: true,
+                          id: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          projectGuideMapping: {
+            select: {
+              id: true,
+              faculty: {
+                select: {
+                  name: true,
+                  employeeId: true,
+                  profilePicture: true,
+                },
+              },
+            },
+          },
+        },
       });
       return resolve(project);
     } catch (error) {
@@ -51,12 +164,108 @@ const create = (data: Prisma.projectsUncheckedCreateInput) => {
   });
 };
 const update = (data: Prisma.projectsUpdateInput, id: number) => {
-  return new Promise<projects>(async (resolve, reject) => {
+  return new Promise<{
+    id: number;
+  }>(async (resolve, reject) => {
     try {
       const project = await prisma.projects.update({
         data: data,
         where: {
           id: id,
+        },
+        select: {
+          id: true,
+          name: true,
+          academic: {
+            select: {
+              id: true,
+              sem: true,
+              year: true,
+              maximumGroupMember: true,
+            },
+          },
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          frontendTechnology: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              description: true,
+              url: true,
+            },
+          },
+          databaseTechnology: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              description: true,
+              url: true,
+            },
+          },
+          backendTechnology: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
+              description: true,
+              url: true,
+            },
+          },
+          isVerified: true,
+          description: true,
+          media: {
+            select: {
+              id: true,
+              format: true,
+              identifier: true,
+              name: true,
+            },
+          },
+          group: {
+            select: {
+              id: true,
+              name: true,
+              groupParticipants: {
+                select: {
+                  id: true,
+                  role: true,
+                  student: {
+                    select: {
+                      id: true,
+                      name: true,
+                      enrollmentNo: true,
+                      profilePicture: true,
+                      branch: {
+                        select: {
+                          name: true,
+                          displayName: true,
+                          id: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          projectGuideMapping: {
+            select: {
+              id: true,
+              faculty: {
+                select: {
+                  name: true,
+                  employeeId: true,
+                  profilePicture: true,
+                },
+              },
+            },
+          },
         },
       });
       return resolve(project);

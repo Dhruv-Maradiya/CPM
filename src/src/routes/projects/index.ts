@@ -45,7 +45,8 @@ router.post("/", upload.array("files"), auth, async (req, res, next) => {
 
     const body: Prisma.projectsUncheckedCreateInput = validatedBody;
     const project = await Projects.create(body);
-    await Projects.upload(project.id, files);
+    
+    await Projects.upload(project.id as number, files);
     res.locals["data"] = project;
     next();
   } catch (error) {
