@@ -69,7 +69,9 @@ const findMany = ({ select, where, orderBy, skip, take }: FindManyArgs) => {
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.academics.count(),
+        prisma.academics.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
       return resolve({ academics, count });
     } catch (error) {

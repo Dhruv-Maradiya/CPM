@@ -81,7 +81,7 @@ const findMany = ({ take, skip, select, where, orderBy }: FindManyArgs) => {
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.groups.count(),
+        prisma.groups.count({ ...(where ? { where: where } : {}) }),
       ]);
       return resolve({ groups, count });
     } catch (error) {

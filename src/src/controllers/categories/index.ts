@@ -70,7 +70,9 @@ const findMany = ({ select, where, orderBy, take, skip }: FindManyArgs) => {
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.category.count(),
+        prisma.category.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
       return resolve({ categories, count });
     } catch (error) {

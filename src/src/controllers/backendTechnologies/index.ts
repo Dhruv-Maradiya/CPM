@@ -70,7 +70,9 @@ const findMany = ({ select, where, orderBy, take, skip }: FindManyArgs) => {
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.backendTechnologies.count(),
+        prisma.backendTechnologies.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
       return resolve({ backendTechnologies, count });
     } catch (error) {

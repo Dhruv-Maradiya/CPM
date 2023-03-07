@@ -144,7 +144,9 @@ const findMany = ({ select, where, skip, take, orderBy }: FindManyArgs) => {
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.invitationForGroup.count(),
+        prisma.invitationForGroup.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
       return resolve({ invitationForGroup, count });
     } catch (error) {

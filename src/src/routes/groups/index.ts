@@ -137,5 +137,56 @@ router.get("/findMany", async (_req, res, next) => {
     next(error);
   }
 });
+router.get("/findMy", auth, async (_req, res, next) => {
+  try {
+    const userDetails = res.locals["user"];
+    const groups = await Groups.findMany({
+      select: {
+        id: true,
+        name: true,
+        academic: {
+          select: {
+            id: true,
+            year: true,
+            sem: true,
+          },
+        },
+        groupParticipants: {
+          select: {
+            id: true,
+            role: true,
+            semester: true,
+            student: {
+              select: {
+                id: true,
+                enrollmentNo: true,
+                name: true,
+              },
+            },
+          },
+        },
+        projects: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+      },
+      where: {
+        groupParticipants: {
+          some: {
+            studentId: userDetails.userDetails.id,
+          },
+        },
+      },
+    });
+
+    res.locals["data"] = groups;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;

@@ -150,7 +150,9 @@ const findMany = ({ take, skip, select, where, orderBy }: FindManyArgs) => {
           ...(take != null ? { take: take } : {}),
           ...(skip != null ? { skip: skip } : {}),
         }),
-        prisma.faculty.count(),
+        prisma.faculty.count({
+          ...(where ? { where: where } : {}),
+        }),
       ]);
       return resolve({ faculties: faculties, count: count });
     } catch (error) {
