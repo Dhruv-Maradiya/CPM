@@ -27,7 +27,7 @@ const updateStatus = (
   data: Prisma.invitationForGroupUncheckedUpdateInput,
   id: number
 ) => {
-  return new Promise<invitationForGroup>(async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const status = data.status;
 
@@ -73,6 +73,30 @@ const updateStatus = (
             data: {
               status: status,
             },
+            select: {
+              id: true,
+              group: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              groupLeader: {
+                select: {
+                  id: true,
+                  name: true,
+                  enrollmentNo: true,
+                },
+              },
+              member: {
+                select: {
+                  id: true,
+                  name: true,
+                  enrollmentNo: true,
+                },
+              },
+              status: true,
+            },
           });
           return resolve(invitationForGroup);
         } else if (status === "ACCEPTED") {
@@ -83,6 +107,30 @@ const updateStatus = (
               },
               data: {
                 status: status,
+              },
+              select: {
+                id: true,
+                group: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                groupLeader: {
+                  select: {
+                    id: true,
+                    name: true,
+                    enrollmentNo: true,
+                  },
+                },
+                member: {
+                  select: {
+                    id: true,
+                    name: true,
+                    enrollmentNo: true,
+                  },
+                },
+                status: true,
               },
             }),
             prisma.groupParticipants.createMany({
@@ -154,7 +202,6 @@ const findMany = ({ select, where, skip, take, orderBy }: FindManyArgs) => {
     }
   });
 };
-
 export default {
   create,
   updateStatus,
