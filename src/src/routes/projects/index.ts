@@ -45,7 +45,8 @@ router.post("/", upload.array("files"), auth, async (req, res, next) => {
 
     const body: Prisma.projectsUncheckedCreateInput = validatedBody;
     const project = await Projects.create(body);
-    await Projects.upload(project.id, files);
+
+    await Projects.upload(project.id as number, files);
     res.locals["data"] = project;
     next();
   } catch (error) {
@@ -311,6 +312,10 @@ router.get("/findManyByStudent", async (req, res, next) => {
     if (studentId === undefined || studentId === null) {
       throw new BadRequestError("StudentId is required");
     }
+    if (typeof studentId !== "string") {
+      throw new BadRequestError("StudentId must be a string");
+    }
+    const student = parseInt(studentId);
 
     const projects = await Projects.findMany({
       take,
@@ -405,6 +410,15 @@ router.get("/findManyByStudent", async (req, res, next) => {
                 employeeId: true,
                 profilePicture: true,
               },
+            },
+          },
+        },
+      },
+      where: {
+        group: {
+          groupParticipants: {
+            some: {
+              studentId: student,
             },
           },
         },

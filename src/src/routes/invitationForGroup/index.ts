@@ -87,6 +87,13 @@ router.get("/findManyByStudentReceived", auth, async (req, res, next) => {
             enrollmentNo: true,
           },
         },
+        member: {
+          select: {
+            id: true,
+            name: true,
+            enrollmentNo: true,
+          },
+        },
         status: true,
       },
     });
@@ -119,6 +126,13 @@ router.get("/findManyByLeader", auth, async (req, res, next) => {
           },
         },
         groupLeader: {
+          select: {
+            id: true,
+            name: true,
+            enrollmentNo: true,
+          },
+        },
+        member: {
           select: {
             id: true,
             name: true,

@@ -45,13 +45,12 @@ const update = yup
 
 const find = yup.object().shape({ id: yup.number().required() });
 
-const findManyInvite = yup
-  .object()
-  .shape({
-    groupId: yup.number().required(),
-    skip: yup.number().required(),
-    take: yup.number().required(),
-  });
+const findManyInvite = yup.object().shape({
+  groupId: yup.number().required(),
+  search: yup.string().optional(),
+  skip: yup.number().required(),
+  take: yup.number().required(),
+});
 
 const login = yup.object().shape({
   enrollmentNo: yup.string().length(12).required(),

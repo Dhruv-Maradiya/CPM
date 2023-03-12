@@ -81,6 +81,7 @@ router.get("/find", async (req, res, next) => {
                 id: true,
                 enrollmentNo: true,
                 name: true,
+                profilePicture: true,
               },
             },
           },
@@ -168,7 +169,96 @@ router.get("/findMy", auth, async (_req, res, next) => {
           select: {
             id: true,
             name: true,
+            academic: {
+              select: {
+                id: true,
+                sem: true,
+                year: true,
+                maximumGroupMember: true,
+              },
+            },
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            frontendTechnology: {
+              select: {
+                id: true,
+                name: true,
+                logo: true,
+                description: true,
+                url: true,
+              },
+            },
+            databaseTechnology: {
+              select: {
+                id: true,
+                name: true,
+                logo: true,
+                description: true,
+                url: true,
+              },
+            },
+            backendTechnology: {
+              select: {
+                id: true,
+                name: true,
+                logo: true,
+                description: true,
+                url: true,
+              },
+            },
+            isVerified: true,
             description: true,
+            media: {
+              select: {
+                id: true,
+                format: true,
+                identifier: true,
+                name: true,
+              },
+            },
+            group: {
+              select: {
+                id: true,
+                name: true,
+                groupParticipants: {
+                  select: {
+                    id: true,
+                    role: true,
+                    student: {
+                      select: {
+                        id: true,
+                        name: true,
+                        enrollmentNo: true,
+                        profilePicture: true,
+                        branch: {
+                          select: {
+                            name: true,
+                            displayName: true,
+                            id: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            projectGuideMapping: {
+              select: {
+                id: true,
+                faculty: {
+                  select: {
+                    name: true,
+                    employeeId: true,
+                    profilePicture: true,
+                  },
+                },
+              },
+            },
           },
         },
       },

@@ -170,6 +170,13 @@ router.get("/findManyForInvite", auth, async (req, res, next) => {
         id: {
           not: userDetails.userDetails.id,
         },
+        ...(query["search"] != null
+          ? {
+              enrollmentNo: {
+                startsWith: query["search"],
+              },
+            }
+          : {}),
       },
     });
 
