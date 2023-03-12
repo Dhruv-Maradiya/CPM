@@ -23,37 +23,7 @@ router.post("/", auth, async (req, res, next) => {
       const group = await Groups.create(body, transaction);
       await Groups.assignLeader(group.id, leaderId, transaction);
 
-      return await Groups.find({
-        where: {
-          id: group.id,
-        },
-        select: {
-          id: true,
-          name: true,
-          academic: {
-            select: {
-              id: true,
-              year: true,
-              sem: true,
-            },
-          },
-          groupParticipants: {
-            select: {
-              id: true,
-              role: true,
-              semester: true,
-              student: {
-                select: {
-                  id: true,
-                  enrollmentNo: true,
-                  name: true,
-                  profilePicture: true,
-                },
-              },
-            },
-          },
-        },
-      });
+      return group;
     });
 
     res.locals["data"] = group;
