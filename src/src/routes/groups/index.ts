@@ -22,7 +22,38 @@ router.post("/", auth, async (req, res, next) => {
     const group = await prisma.$transaction(async (transaction) => {
       const group = await Groups.create(body, transaction);
       await Groups.assignLeader(group.id, leaderId, transaction);
-      return group;
+
+      return await Groups.find({
+        where: {
+          id: group.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          academic: {
+            select: {
+              id: true,
+              year: true,
+              sem: true,
+            },
+          },
+          groupParticipants: {
+            select: {
+              id: true,
+              role: true,
+              semester: true,
+              student: {
+                select: {
+                  id: true,
+                  enrollmentNo: true,
+                  name: true,
+                  profilePicture: true,
+                },
+              },
+            },
+          },
+        },
+      });
     });
 
     res.locals["data"] = group;
