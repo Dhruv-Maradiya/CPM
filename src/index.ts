@@ -24,6 +24,7 @@ import {
   response as responseHandler,
 } from "./middleware/index.js";
 import { NotFoundError } from "./exceptions/index.js";
+import cors from "cors";
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,12 @@ const port = process.env["PORT"] as unknown as number;
 //
 // ########## MIDDLEWARE ##########
 //
+
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 // logging
 
