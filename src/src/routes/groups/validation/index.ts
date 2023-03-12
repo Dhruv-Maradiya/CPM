@@ -15,6 +15,8 @@ const update = yup
   .shape({
     id: yup.number().required(),
     name: yup.string().optional(),
+    academicId: yup.number().optional(),
+    leaderId: yup.number().optional(),
   })
   .noUnknown(true)
   .strict(true);

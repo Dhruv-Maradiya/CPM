@@ -149,18 +149,35 @@ const assignLeader = (
         throw new NotFoundError("group not found");
       }
 
-      if (
-        groupDetails.academic.maximumGroupMember ===
-        groupDetails.groupParticipants.length
-      ) {
-        throw new MethodNotAllowed(
-          "there's already maximum number of participants in group"
-        );
+      const groupParticipant = groupDetails.groupParticipants.find(
+        (participant) => participant.studentId === studentId
+      );
+
+      if (groupParticipant === undefined) {
+        if (
+          groupDetails.academic.maximumGroupMember ===
+          groupDetails.groupParticipants.length
+        ) {
+          throw new MethodNotAllowed(
+            "there's already maximum number of participants in group"
+          );
+        }
       }
 
       for (let i = 0; i < groupDetails.groupParticipants.length; i++) {
-        if (groupDetails.groupParticipants[i]?.role === "LEADER") {
-          throw new NotFoundError("group is already assigned a leader");
+        if (
+          groupDetails.groupParticipants[i]?.role === "LEADER" &&
+          groupDetails.groupParticipants[i]?.studentId !== studentId
+        ) {
+          // throw new NotFoundError("group is already assigned a leader");
+          await db.groupParticipants.update({
+            where: {
+              id: groupDetails.groupParticipants[i]?.id as unknown as number,
+            },
+            data: {
+              role: "MEMBER",
+            },
+          });
         }
       }
 
@@ -177,14 +194,25 @@ const assignLeader = (
         throw new NotFoundError("student not found");
       }
 
-      await db.groupParticipants.create({
-        data: {
-          groupId: groupId,
-          studentId: studentId,
-          role: "LEADER",
-          semester: studentDetails.semester,
-        },
-      });
+      if (groupParticipant === undefined) {
+        await db.groupParticipants.create({
+          data: {
+            groupId: groupId,
+            studentId: studentId,
+            role: "LEADER",
+            semester: studentDetails.semester,
+          },
+        });
+      } else {
+        await db.groupParticipants.update({
+          where: {
+            id: groupParticipant.id,
+          },
+          data: {
+            role: "LEADER",
+          },
+        });
+      }
 
       resolve();
     } catch (error) {

@@ -39,7 +39,13 @@ router.put("/", auth, async (req, res, next) => {
     const id = req.body.id;
     delete req.body.id;
 
+    if (req.body.leaderId !== undefined) {
+      await Groups.assignLeader(id, req.body.leaderId, undefined);
+      delete req.body.leaderId;
+    }
+
     const body: Prisma.groupsUpdateInput = req.body;
+
     const group = await Groups.update(body, id, undefined);
 
     res.locals["data"] = group;
