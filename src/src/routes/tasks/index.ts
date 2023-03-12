@@ -89,6 +89,9 @@ router.get("/findManyByMember", auth, async (req, res, next) => {
         endTime: true,
         status: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       skip: skip,
       take: take,
     });
@@ -147,6 +150,9 @@ router.get("/findManyByProject", auth, async (req, res, next) => {
         startTime: true,
         endTime: true,
         status: true,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
       skip: skip,
       take: take,
@@ -207,6 +213,9 @@ router.get("/findManyByProjectFaculty", auth, async (req, res, next) => {
         startTime: true,
         endTime: true,
         status: true,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
       skip: skip,
       take: take,
