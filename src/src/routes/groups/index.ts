@@ -101,6 +101,9 @@ router.get("/findMany", async (_req, res, next) => {
     const take = _req.query["take"] ? Number(_req.query["take"]) : 10;
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = _req.query["skip"] ? Number(_req.query["skip"]) : 0;
+
+    const search = _req.query["search"] ?? "";
+
     const groups = await Groups.findMany({
       take: take,
       skip: skip,
@@ -127,6 +130,11 @@ router.get("/findMany", async (_req, res, next) => {
               },
             },
           },
+        },
+      },
+      where: {
+        name: {
+          contains: search as string,
         },
       },
     });

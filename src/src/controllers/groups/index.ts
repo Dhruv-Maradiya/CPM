@@ -45,12 +45,37 @@ const update = (
       if (transaction) {
         db = transaction;
       }
-      const group = await db.groups.update({
+      const group = (await db.groups.update({
         data: data,
         where: {
           id: id,
         },
-      });
+        select: {
+          id: true,
+          name: true,
+          academic: {
+            select: {
+              id: true,
+              year: true,
+              sem: true,
+            },
+          },
+          groupParticipants: {
+            select: {
+              id: true,
+              role: true,
+              semester: true,
+              student: {
+                select: {
+                  id: true,
+                  enrollmentNo: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      })) as unknown as groups;
       return resolve(group);
     } catch (error) {
       reject(error);
