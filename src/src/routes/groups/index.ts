@@ -22,6 +22,7 @@ router.post("/", auth, async (req, res, next) => {
     const group = await prisma.$transaction(async (transaction) => {
       const group = await Groups.create(body, transaction);
       await Groups.assignLeader(group.id, leaderId, transaction);
+
       return group;
     });
 
@@ -39,7 +40,13 @@ router.put("/", auth, async (req, res, next) => {
     const id = req.body.id;
     delete req.body.id;
 
+    if (req.body.leaderId !== undefined) {
+      await Groups.assignLeader(id, req.body.leaderId, undefined);
+      delete req.body.leaderId;
+    }
+
     const body: Prisma.groupsUpdateInput = req.body;
+
     const group = await Groups.update(body, id, undefined);
 
     res.locals["data"] = group;
@@ -101,6 +108,9 @@ router.get("/findMany", async (_req, res, next) => {
     const take = _req.query["take"] ? Number(_req.query["take"]) : 10;
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = _req.query["skip"] ? Number(_req.query["skip"]) : 0;
+
+    const search = _req.query["search"] ?? "";
+
     const groups = await Groups.findMany({
       take: take,
       skip: skip,
@@ -127,6 +137,11 @@ router.get("/findMany", async (_req, res, next) => {
               },
             },
           },
+        },
+      },
+      where: {
+        name: {
+          contains: search as string,
         },
       },
     });

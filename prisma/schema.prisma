@@ -281,6 +281,8 @@ model tasks {
   faculty                 faculty?     @relation(fields: [createdByFacultyId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_2")
   createdByLeader         students?    @relation("tasks_createdByMemberTostudents", fields: [createdByLeaderId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_3")
   project                 projects     @relation(fields: [projectId], references: [id], onUpdate: Restrict, map: "tasks_ibfk_4")
+  createdAt               DateTime     @default(now()) @db.Timestamp(0)
+  updatedAt               DateTime     @default(now()) @db.Timestamp(0)
 
   @@index([assignedToParticipantId], map: "assignedTo")
   @@index([createdByFacultyId], map: "createdByFaculty")
