@@ -36,7 +36,7 @@ router.post("/", async (req, res, next) => {
       false
     );
     const body: Prisma.studentsUncheckedCreateInput = validatedBody;
-    const student = await Students.create(body);
+    const student = await Students.create({ ...body, profilePicture: "" });
     const token = await Students.signToken(student.enrollmentNo, student.id);
 
     res.locals["data"] = { token, student };
