@@ -219,6 +219,8 @@ const assignLeader = (
         throw new NotFoundError("student not found");
       }
 
+      console.log(groupDetails, groupParticipant, studentId);
+
       if (groupParticipant === undefined) {
         await db.groupParticipants.create({
           data: {
@@ -245,6 +247,109 @@ const assignLeader = (
     }
   });
 };
+const addMembers = (
+  groupId: number,
+  members: number[],
+  transaction: Prisma.TransactionClient | undefined
+) => {
+  return new Promise<void>(async (resolve, reject) => {
+    try {
+      let db: PrismaClient | Prisma.TransactionClient = prisma;
+      if (transaction) {
+        db = transaction;
+      }
+      const groupDetails = await db.groups.findUnique({
+        where: {
+          id: groupId,
+        },
+        select: {
+          groupParticipants: {
+            select: {
+              id: true,
+              role: true,
+              studentId: true,
+            },
+          },
+          academic: {
+            select: {
+              maximumGroupMember: true,
+              sem: true,
+            },
+          },
+        },
+      });
+      if (!groupDetails) {
+        throw new NotFoundError("group not found");
+      }
+
+      if (
+        groupDetails.academic.maximumGroupMember ===
+        groupDetails.groupParticipants.length
+      ) {
+        throw new MethodNotAllowed(
+          "there's already maximum number of participants in group"
+        );
+      }
+
+      const groupParticipantsStudentIds = groupDetails.groupParticipants.map(
+        (participant) => participant.studentId
+      );
+
+      members = members.filter(
+        (member) => !groupParticipantsStudentIds.includes(member)
+      );
+
+      if (
+        members.length + groupDetails.groupParticipants.length >
+        groupDetails.academic.maximumGroupMember
+      ) {
+        throw new MethodNotAllowed(
+          "maximum number of participants in group reached"
+        );
+      }
+
+      await db.groupParticipants.createMany({
+        data: members.map((member) => ({
+          groupId: groupId,
+          studentId: member,
+          role: "MEMBER",
+          semester: groupDetails.academic.sem,
+        })),
+      });
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+const removeMember = (
+  groupId: number,
+  member: number,
+  transaction: Prisma.TransactionClient | undefined
+) => {
+  return new Promise<void>(async (resolve, reject) => {
+    try {
+      let db: PrismaClient | Prisma.TransactionClient = prisma;
+      if (transaction) {
+        db = transaction;
+      }
+
+      await db.groupParticipants.delete({
+        where: {
+          groupId_studentId: {
+            groupId: groupId,
+            studentId: member,
+          },
+        },
+      });
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 export default {
   create,
@@ -252,4 +357,6 @@ export default {
   find,
   findMany,
   assignLeader,
+  addMembers,
+  removeMember,
 };

@@ -292,5 +292,47 @@ router.get("/findMy", auth, async (_req, res, next) => {
     next(error);
   }
 });
+router.put("/member/add", auth, async (req, res, next) => {
+  try {
+    type Body = yup.InferType<typeof validation.addMembers>;
+    const body = await validateSchema<Body>(
+      validation.addMembers,
+      req.body,
+      true
+    );
+
+    const groupId = body.groupId;
+
+    await Groups.addMembers(groupId, body.members, undefined);
+
+    res.locals["data"] = {
+      success: true,
+    };
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+router.put("/member/remove", auth, async (req, res, next) => {
+  try {
+    type Body = yup.InferType<typeof validation.removeMember>;
+    const body = await validateSchema<Body>(
+      validation.removeMember,
+      req.body,
+      true
+    );
+
+    const groupId = body.groupId;
+
+    await Groups.removeMember(groupId, body.member, undefined);
+
+    res.locals["data"] = {
+      success: true,
+    };
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;
