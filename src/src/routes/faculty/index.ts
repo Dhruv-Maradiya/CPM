@@ -164,7 +164,7 @@ router.post("/login", async (req, res, next) => {
       req.body,
       false
     );
-    const { token, userId, role } = await Faculty.login(
+    const { token, userId, role, name } = await Faculty.login(
       validatedBody.employeeId,
       validatedBody.password
     );
@@ -173,6 +173,7 @@ router.post("/login", async (req, res, next) => {
       token: token,
       userId: userId,
       role: role,
+      name: name,
     };
     next();
   } catch (error) {
