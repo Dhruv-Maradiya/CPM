@@ -6,6 +6,7 @@ import { ForbiddenError, NotFoundError } from "../../../exceptions/index.js";
 type LoginResponse = {
   token: string;
   userId: number;
+  role: string;
 };
 type FindManyArgs = {
   select?: Prisma.facultySelect;
@@ -19,7 +20,7 @@ type FindOneArgs = {
   where: Prisma.facultyWhereUniqueInput;
 };
 
-const create = (data: Prisma.facultyUncheckedCreateInput) => {
+const create = (data: Prisma.facultyCreateInput) => {
   return new Promise<{
     number: string;
     employeeId: string;
@@ -200,7 +201,11 @@ const login = (employeeId: string, password: string) => {
         type: "FACULTY",
       });
 
-      return resolve({ token, userId: faculty.id });
+      return resolve({
+        token,
+        userId: faculty.id,
+        role: faculty.facultyRoles.name,
+      });
     } catch (error) {
       reject(error);
     }

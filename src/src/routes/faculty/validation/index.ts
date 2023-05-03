@@ -3,7 +3,7 @@ import { yup } from "../../../../utils/index.js";
 const create = yup
   .object()
   .shape({
-    roleId: yup.number().required(),
+    role: yup.string().oneOf(["HOD", "LECTURER"]).required(),
     employeeId: yup.string().max(15).required(),
     name: yup.string().max(255).required(),
     password: yup
@@ -32,9 +32,10 @@ const update = yup
     employeeId: yup.string().max(15).optional(),
     name: yup.string().max(255).optional(),
     email: yup.string().email().optional(),
+    isBlocked: yup.boolean().optional(),
     number: yup
       .string()
-      .matches(/a/, "number must be a valid number")
+      .matches(/^[0-9]{10}$/, "number must be a valid number")
       .optional(),
     password: yup
       .string()

@@ -35,7 +35,24 @@ router.post("/", auth, async (req, res, next) => {
       req.body,
       false
     );
-    const body: Prisma.facultyUncheckedCreateInput = validatedBody;
+
+    const body: Prisma.facultyCreateInput = {
+      email: validatedBody.email,
+      employeeId: validatedBody.employeeId,
+      number: validatedBody.number,
+      name: validatedBody.name,
+      password: validatedBody.password,
+      facultyRoles: {
+        connect: {
+          name: validatedBody.role,
+        },
+      },
+      createdBy: {
+        connect: {
+          id: validatedBody.createdById,
+        },
+      },
+    };
     const faculty = await Faculty.create(body);
 
     res.locals["data"] = faculty;
@@ -129,6 +146,7 @@ router.get("/findMany", auth, async (_req, res, next) => {
         employeeId: true,
         number: true,
         profilePicture: true,
+        isBlocked: true,
       },
     });
 
@@ -146,7 +164,7 @@ router.post("/login", async (req, res, next) => {
       req.body,
       false
     );
-    const { token, userId } = await Faculty.login(
+    const { token, userId, role } = await Faculty.login(
       validatedBody.employeeId,
       validatedBody.password
     );
@@ -154,6 +172,7 @@ router.post("/login", async (req, res, next) => {
     res.locals["data"] = {
       token: token,
       userId: userId,
+      role: role,
     };
     next();
   } catch (error) {
