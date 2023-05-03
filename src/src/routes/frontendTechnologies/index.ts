@@ -71,7 +71,6 @@ router.put("/", auth, upload.single("file"), async (req, res, next) => {
     res.locals["data"] = frontendTechnology;
     next();
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });
@@ -92,6 +91,7 @@ router.get("/find", async (req, res, next) => {
         id: true,
         name: true,
         logo: true,
+        description: true,
         url: true,
       },
     });

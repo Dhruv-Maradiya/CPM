@@ -219,7 +219,6 @@ const assignLeader = (
         throw new NotFoundError("student not found");
       }
 
-      console.log(groupDetails, groupParticipant, studentId);
 
       if (groupParticipant === undefined) {
         await db.groupParticipants.create({

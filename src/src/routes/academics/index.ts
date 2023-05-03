@@ -22,7 +22,6 @@ router.post("/", auth, async (req, res, next) => {
     res.locals["data"] = academics;
     next();
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });

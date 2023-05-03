@@ -90,6 +90,8 @@ router.get("/find", async (req, res, next) => {
       select: {
         id: true,
         name: true,
+        logo: true,
+        description: true,
         url: true,
       },
     });

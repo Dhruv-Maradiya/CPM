@@ -57,8 +57,6 @@ router.get(
         };
       }
 
-      console.log(whereArgs);
-
       const [projects, categories] = await Promise.all([
         Projects.findMany({
           take,
