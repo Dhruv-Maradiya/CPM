@@ -8,6 +8,7 @@ type LoginResponse = {
   userId: number;
   role: string;
   name: string;
+  profilePicture: string | null;
 };
 type FindManyArgs = {
   select?: Prisma.facultySelect;
@@ -171,6 +172,7 @@ const login = (employeeId: string, password: string) => {
         },
         select: {
           name: true,
+          profilePicture: true,
           password: true,
           employeeId: true,
           id: true,
@@ -208,6 +210,7 @@ const login = (employeeId: string, password: string) => {
         userId: faculty.id,
         role: faculty.facultyRoles.name,
         name: faculty.name,
+        profilePicture: faculty.profilePicture,
       });
     } catch (error) {
       reject(error);
