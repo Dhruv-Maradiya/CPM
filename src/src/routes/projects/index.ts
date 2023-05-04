@@ -79,10 +79,21 @@ router.put("/", upload.array("files"), auth, async (req, res, next) => {
       };
       delete req.body.removeImages;
     }
+    if (req.body.guideIds?.length > 0) {
+      if (req.body.projectGuideMapping == undefined) {
+        req.body.projectGuideMapping = {};
+      }
+      req.body.projectGuideMapping.createMany = {
+        data: req.body.guideIds.map((guideId: number) => ({
+          guideId: guideId,
+        })),
+      };
+
+      delete req.body.guideIds;
+    }
     const body: Prisma.projectsUpdateInput = req.body;
 
     const project = await Projects.update(body, id);
-    console.log(files);
     if (files !== undefined && files.length > 0) {
       await Projects.upload(project.id, files);
     }
@@ -192,6 +203,7 @@ router.get("/find", async (req, res, next) => {
             id: true,
             faculty: {
               select: {
+                id: true,
                 name: true,
                 employeeId: true,
                 profilePicture: true,
@@ -287,6 +299,19 @@ router.get("/findMany", async (req, res, next) => {
                     enrollmentNo: true,
                   },
                 },
+              },
+            },
+          },
+        },
+        projectGuideMapping: {
+          select: {
+            id: true,
+            faculty: {
+              select: {
+                id: true,
+                name: true,
+                employeeId: true,
+                profilePicture: true,
               },
             },
           },
@@ -409,6 +434,7 @@ router.get("/findManyByStudent", async (req, res, next) => {
             id: true,
             faculty: {
               select: {
+                id: true,
                 name: true,
                 employeeId: true,
                 profilePicture: true,
@@ -429,6 +455,21 @@ router.get("/findManyByStudent", async (req, res, next) => {
     });
 
     res.locals["data"] = projects;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+router.delete("/guide/remove", async (req, res, next) => {
+  try {
+    const guideId = Number(req.query["guideId"]) as unknown as number;
+    const projectId = Number(req.query["projectId"]) as unknown as number;
+
+    await Projects.removeGuide(guideId, projectId);
+
+    res.locals["data"] = {
+      success: true,
+    };
     next();
   } catch (error) {
     next(error);

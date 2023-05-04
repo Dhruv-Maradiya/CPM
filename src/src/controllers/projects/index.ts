@@ -411,6 +411,22 @@ const projectsByStudent = (studentId: number) => {
   });
 };
 
+const removeGuide = (guideId: number, projectId: number) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await prisma.projectGuideMapping.deleteMany({
+        where: {
+          projectId: projectId,
+          id: guideId,
+        },
+      });
+      resolve(true);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 export default {
   create,
   update,
@@ -418,4 +434,5 @@ export default {
   findMany,
   projectsByStudent,
   upload,
+  removeGuide,
 };
