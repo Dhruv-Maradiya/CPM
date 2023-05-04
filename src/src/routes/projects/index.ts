@@ -82,7 +82,10 @@ router.put("/", upload.array("files"), auth, async (req, res, next) => {
     const body: Prisma.projectsUpdateInput = req.body;
 
     const project = await Projects.update(body, id);
-    await Projects.upload(project.id, files);
+    console.log(files);
+    if (files !== undefined && files.length > 0) {
+      await Projects.upload(project.id, files);
+    }
 
     res.locals["data"] = project;
     next();

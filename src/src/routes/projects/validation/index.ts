@@ -28,6 +28,7 @@ const update = yup
     groupId: yup.number().optional(),
     description: yup.string().optional(),
     removeImages: yup.array().of(yup.number()).optional(),
+    isVerified: yup.boolean().optional(),
   })
   .noUnknown(true)
   .strict(true);
