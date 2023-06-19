@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.post("/", auth, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     const validatedBody = await validateSchema<Body>(
@@ -61,7 +61,7 @@ router.post("/", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", auth, upload.single("file"), async (req, res, next) => {
+router.put("/", upload.single("file"), async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     req.body = await validateSchema<Body>(validation.update, req.body, true);
@@ -82,7 +82,7 @@ router.put("/", auth, upload.single("file"), async (req, res, next) => {
     next(error);
   }
 });
-router.get("/find", auth, async (req, res, next) => {
+router.get("/find", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.find>;
     const validatedQuery = await validateSchema<Body>(
@@ -124,7 +124,7 @@ router.get("/find", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findMany", auth, async (_req, res, next) => {
+router.get("/findMany", async (_req, res, next) => {
   try {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const take = _req.query["take"] ? Number(_req.query["take"]) : 10;

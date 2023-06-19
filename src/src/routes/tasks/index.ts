@@ -8,7 +8,7 @@ import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", auth, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     req.body = await validateSchema<Body>(validation.create, req.body, true);
@@ -21,7 +21,7 @@ router.post("/", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", auth, async (req, res, next) => {
+router.put("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     req.body = await validateSchema<Body>(validation.update, req.body, true);
@@ -38,7 +38,7 @@ router.put("/", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyByMember", auth, async (req, res, next) => {
+router.get("/findManyByMember", async (req, res, next) => {
   try {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
@@ -102,7 +102,7 @@ router.get("/findManyByMember", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyByProject", auth, async (req, res, next) => {
+router.get("/findManyByProject", async (req, res, next) => {
   try {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;
@@ -164,7 +164,7 @@ router.get("/findManyByProject", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyByProjectFaculty", auth, async (req, res, next) => {
+router.get("/findManyByProjectFaculty", async (req, res, next) => {
   try {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const skip = req.query["skip"] ? Number(req.query["skip"]) : 0;

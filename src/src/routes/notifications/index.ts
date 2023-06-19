@@ -8,7 +8,7 @@ import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", auth, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     const validatedSchema = await validateSchema<Body>(
@@ -30,7 +30,7 @@ router.post("/", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyByFaculty", auth, async (req, res, next) => {
+router.get("/findManyByFaculty", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.findManyByFaculty>;
     const query = await validateSchema<Body>(
@@ -56,7 +56,7 @@ router.get("/findManyByFaculty", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyByStudent", auth, async (_req, res, next) => {
+router.get("/findManyByStudent", async (_req, res, next) => {
   try {
     const id = res.locals["user"].userDetails.id as number;
 

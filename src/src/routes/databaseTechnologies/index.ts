@@ -28,7 +28,7 @@ const upload = multer({ storage: storage });
 
 const router = Router();
 
-router.post("/", auth, upload.single("file"), async (req, res, next) => {
+router.post("/", upload.single("file"), async (req, res, next) => {
   try {
     const file = req.file as Express.Multer.File;
 
@@ -53,7 +53,7 @@ router.post("/", auth, upload.single("file"), async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", auth, upload.single("file"), async (req, res, next) => {
+router.put("/", upload.single("file"), async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     await validateSchema<Body>(validation.update, req.body, true);

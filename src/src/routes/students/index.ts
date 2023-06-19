@@ -45,7 +45,7 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", auth, upload.single("file"), async (req, res, next) => {
+router.put("/", upload.single("file"), async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     req.body = await validateSchema<Body>(validation.update, req.body, true);
@@ -136,7 +136,7 @@ router.get("/findMany", async (req, res, next) => {
     next(error);
   }
 });
-router.get("/findManyForInvite", auth, async (req, res, next) => {
+router.get("/findManyForInvite", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.findManyInvite>;
     const query = await validateSchema<Body>(

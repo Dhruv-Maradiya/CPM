@@ -8,7 +8,7 @@ import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", auth, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     const validatedBody = await validateSchema<Body>(
@@ -25,7 +25,7 @@ router.post("/", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", auth, async (req, res, next) => {
+router.put("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     await validateSchema<Body>(validation.update, req.body, true);

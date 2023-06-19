@@ -8,7 +8,7 @@ import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
-router.post("/", auth, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.create>;
     await validateSchema<Body>(validation.create, req.body, false);
@@ -32,7 +32,7 @@ router.post("/", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", auth, async (req, res, next) => {
+router.put("/", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.update>;
     await validateSchema<Body>(validation.update, req.body, true);
@@ -152,7 +152,7 @@ router.get("/findMany", async (_req, res, next) => {
     next(error);
   }
 });
-router.get("/findMy", auth, async (_req, res, next) => {
+router.get("/findMy", async (_req, res, next) => {
   try {
     const userDetails = res.locals["user"];
     const groups = await Groups.findMany({
@@ -292,7 +292,7 @@ router.get("/findMy", auth, async (_req, res, next) => {
     next(error);
   }
 });
-router.put("/member/add", auth, async (req, res, next) => {
+router.put("/member/add", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.addMembers>;
     const body = await validateSchema<Body>(
@@ -313,7 +313,7 @@ router.put("/member/add", auth, async (req, res, next) => {
     next(error);
   }
 });
-router.put("/member/remove", auth, async (req, res, next) => {
+router.put("/member/remove", async (req, res, next) => {
   try {
     type Body = yup.InferType<typeof validation.removeMember>;
     const body = await validateSchema<Body>(

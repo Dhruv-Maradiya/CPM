@@ -28,7 +28,7 @@ const upload = multer({ storage: storage });
 
 const router = Router();
 
-router.post("/", upload.array("files"), auth, async (req, res, next) => {
+router.post("/", upload.array("files"), async (req, res, next) => {
   try {
     const files = req.files as Express.Multer.File[];
 
@@ -53,7 +53,7 @@ router.post("/", upload.array("files"), auth, async (req, res, next) => {
     next(error);
   }
 });
-router.put("/", upload.array("files"), auth, async (req, res, next) => {
+router.put("/", upload.array("files"), async (req, res, next) => {
   try {
     const files = req.files as Express.Multer.File[];
 
