@@ -4,7 +4,6 @@ import { Router } from "express";
 import { validateSchema, yup } from "../../../utils/index.js";
 import MediaComments from "../../controllers/mediaComments/index.js";
 import validation from "./validation/index.js";
-import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 

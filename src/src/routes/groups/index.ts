@@ -4,7 +4,6 @@ import { Router } from "express";
 import { prisma, validateSchema, yup } from "../../../utils/index.js";
 import Groups from "../../controllers/groups/index.js";
 import validation from "./validation/index.js";
-import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 

@@ -1,14 +1,13 @@
 /* eslint-disable no-async-promise-executor */
 import { Prisma } from "@prisma/client";
 import { Router } from "express";
+import multer from "multer";
+import path from "path";
+import url from "url";
+import { NotFoundError } from "../../../exceptions/index.js";
 import { validateSchema, yup } from "../../../utils/index.js";
 import FrontendTechnologies from "../../controllers/frontendTechnologies/index.js";
 import validation from "./validation/index.js";
-import { auth } from "../../../middleware/index.js";
-import path from "path";
-import url from "url";
-import multer from "multer";
-import { NotFoundError } from "../../../exceptions/index.js";
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

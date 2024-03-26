@@ -1,13 +1,12 @@
 /* eslint-disable no-async-promise-executor */
 import { Prisma } from "@prisma/client";
 import { Router } from "express";
+import multer from "multer";
+import path from "path";
+import url from "url";
 import { validateSchema, yup } from "../../../utils/index.js";
 import Students from "../../controllers/students/index.js";
 import validation from "./validation/index.js";
-import { auth } from "../../../middleware/index.js";
-import path from "path";
-import url from "url";
-import multer from "multer";
 
 const router = Router();
 

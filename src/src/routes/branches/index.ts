@@ -4,7 +4,6 @@ import { Router } from "express";
 import { validateSchema, yup } from "../../../utils/index.js";
 import Branches from "../../controllers/branches/index.js";
 import validation from "./validation/index.js";
-import { auth } from "../../../middleware/index.js";
 
 const router = Router();
 
